@@ -27,7 +27,7 @@ provider:
 functions:
   #analysis
   transcribeJobProducer:
-    handler: functions/source/transcribe/transcribeHandler.handler
+    handler: transcribe/transcribeHandler.handler
     role: TranscribeS3DynamoDBRole
     environment:
       TRANSCRIBE_OUTPUT_BUCKET:
@@ -43,7 +43,7 @@ functions:
             Ref: TranscriptionAudioFiles
           event: s3:ObjectCreated:*
   splitTranscript:
-    handler: functions/source/analysis/splitTranscript.handler
+    handler: analysis/splitTranscript.handler
     role: TranscriptSplitterRole
     environment:
       SPLIT_TRANSCRIPT_OUTPUT_BUCKET:
@@ -62,7 +62,7 @@ functions:
             Ref: TranscriptionOutput
           event: s3:ObjectCreated:*
   analyseText:
-    handler: functions/source/analysis/analyseTranscript.handler
+    handler: analysis/analyseTranscript.handler
     role: ComprehendFullAccessRole
     environment:
       TEXT_ANALYSIS_OUTPUT_BUCKET:
@@ -98,7 +98,7 @@ functions:
 
   #API
   getTranscripts:
-    handler: functions/source/api/getTranscripts.handler
+    handler: api/getTranscripts.handler
     role: ScanTranscriptsRole
     environment:
       TABLE_NAME:
@@ -125,7 +125,7 @@ functions:
               - email
               - openid
   getAudio:
-    handler: functions/source/api/getAudio.handler
+    handler: api/getAudio.handler
     role: TranscriptionAudioFilesRole
     environment:
       BUCKET_NAME:
@@ -151,7 +151,7 @@ functions:
               - email
               - openid
   getSentiment:
-    handler: functions/source/api/getSentiments.handler
+    handler: api/getSentiments.handler
     role: GetSentimentsRole
     environment:
       BUCKET:
@@ -177,7 +177,7 @@ functions:
               - email
               - openid
   getPresignedUrl:
-    handler: functions/source/api/getPresignedUrl.handler
+    handler: api/getPresignedUrl.handler
     role: TranscriptionAudioFilesRole
     environment:
       BUCKET_NAME:
@@ -209,7 +209,7 @@ functions:
               - email
               - openid
   updateStatus:
-    handler: functions/source/api/updateStatus.handler
+    handler: api/updateStatus.handler
     role: DynamoBatchWriteRole
     environment:
       TABLE_NAME:
@@ -237,7 +237,7 @@ functions:
               - email
               - openid
   quickSightFederationFunction:
-    handler: functions/source/api/quicksightAuth.handler
+    handler: api/quicksightAuth.handler
     role: LambdaBasicExecutionRole
     events:
       - http:
@@ -258,7 +258,7 @@ functions:
   
   #classifiers and endpoints
   createCallResolutionClassifer:
-    handler: functions/source/classifiers/callResolutionClassifier.handler
+    handler: classifiers/callResolutionClassifier.handler
     role: ComprehendFullAccessRole
     environment:
       DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
@@ -279,7 +279,7 @@ functions:
             Ref: ComprehendCallResolutionBucket
           event: s3:ObjectCreated:*
   createCallMotivationClassifier:
-    handler: functions/source/classifiers/createMotivationClassifier.handler
+    handler: classifiers/createMotivationClassifier.handler
     role: ComprehendFullAccessRole
     environment:
       DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
@@ -299,7 +299,7 @@ functions:
             Ref: ComprehendCallMotivationBucket
           event: s3:ObjectCreated:*
   createCallResolutionEndpoint:
-    handler: functions/source/endpoints/callResolutionEnpoint.handler
+    handler: endpoints/callResolutionEnpoint.handler
     role: ComprehendFullAccessRole
     environment:
       DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
@@ -314,7 +314,7 @@ functions:
     events: 
       - schedule: rate(3 minutes)
   createCallMotivationEndpoint:
-    handler: functions/source/endpoints/createMotivationEndpoint.handler
+    handler: endpoints/createMotivationEndpoint.handler
     role: ComprehendFullAccessRole
     environment:
       DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
@@ -392,11 +392,11 @@ resources:
       Default: quickstart-onica-post-call-analytics/
 
   externalResourceFiles:
-    - ${file(templates/roles.template.yaml)}
-    - ${file(templates/auth-resources.template.yaml)}
-    - ${file(templates/pca-resources.template.yaml)}
-    - ${file(templates/cleanup.template.yaml)}
-    - ${file(templates/portal.template.yaml)}
+    - ${file(../../templates/roles.template.yaml)}
+    - ${file(../../templates/auth-resources.template.yaml)}
+    - ${file(../../templates/pca-resources.template.yaml)}
+    - ${file(../../templates/cleanup.template.yaml)}
+    - ${file(../../templates/portal.template.yaml)}
 
   Outputs:
     Stage:
