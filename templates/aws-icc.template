@@ -43,14 +43,14 @@
         "TranscribeS3DynamoDBRole"
       ]
     }, 
-    "TranscribeJobProducerLambdaVersionGQeBDDE0UJ6Lmx9xNYTrDUhfF6m9pVUZuHGWlNKwkA": {
+    "TranscribeJobProducerLambdaVersionuUWpj61zZb74nAOOD5EyTU7Mimyd1NBSXAfqvmJRc": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "TranscribeJobProducerLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "SplitTranscriptLambdaFunction": {
@@ -97,14 +97,14 @@
         "TranscriptSplitterRole"
       ]
     }, 
-    "SplitTranscriptLambdaVersionqPTltlz0KrIIcQJGV98Dok4XPtDWEpe4czG8y1rNzc": {
+    "SplitTranscriptLambdaVersionjicBtPNhIW8Q153XZnDBoGL8bBy62UtlR9c8RXt0A": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "SplitTranscriptLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "AnalyseTextLambdaFunction": {
@@ -184,14 +184,14 @@
         "ComprehendFullAccessRole"
       ]
     }, 
-    "AnalyseTextLambdaVersion05LN01XebMgSmAgMj2v3iG953viQmEYNb5Y09gmY": {
+    "AnalyseTextLambdaVersionNvpHFIoAeXib8hglMWXmpqwSoTkeIhLI7xr0qCjZCQY": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "AnalyseTextLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "GetTranscriptsLambdaFunction": {
@@ -235,14 +235,14 @@
         "ScanTranscriptsRole"
       ]
     }, 
-    "GetTranscriptsLambdaVersiond50LvrpHmWjVpzisjqOBnWGgK3tlySEU8YR7iqco6k": {
+    "GetTranscriptsLambdaVersionBMDOKyLmd09AeFJkkEv3jxouUy11AJuMByh1W2XZo": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "GetTranscriptsLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "GetAudioLambdaFunction": {
@@ -289,14 +289,14 @@
         "TranscriptionAudioFilesRole"
       ]
     }, 
-    "GetAudioLambdaVersionpi55sCjEtLpWimCa1YUklxgFZQektpb9iMNygJTRjU": {
+    "GetAudioLambdaVersionv1YDCft32Ul0AmTZp58GltKjVJrRxGfgETFsRGUTU": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "GetAudioLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "GetSentimentLambdaFunction": {
@@ -343,14 +343,14 @@
         "GetSentimentsRole"
       ]
     }, 
-    "GetSentimentLambdaVersionzCU0lXHI7nk4uFKnvkHq8ztOAFMbnWF1jMqy5SUUM": {
+    "GetSentimentLambdaVersionjzGED65H96phijF85kKsVhZlRLhJ8DjWcDdIy4JfBA": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "GetSentimentLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "GetPresignedUrlLambdaFunction": {
@@ -409,14 +409,14 @@
         "TranscriptionAudioFilesRole"
       ]
     }, 
-    "GetPresignedUrlLambdaVersiont6jVaeVgiBuCSWNm2f5uHrge1028xnShb9LSvMAFpA": {
+    "GetPresignedUrlLambdaVersionAMpaQh8shicDTvgQ2rikiB6qtBz8hTjju5G146cNb4": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "GetPresignedUrlLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "UpdateStatusLambdaFunction": {
@@ -466,14 +466,14 @@
         "DynamoBatchWriteRole"
       ]
     }, 
-    "UpdateStatusLambdaVersionQqX7JvwWAZFYNci70HcI1JyvlXswn8x7GBJS6taBg": {
+    "UpdateStatusLambdaVersionnWE4mHiwfU2XyL3E1BimFtdzXpe4lkKGEYLwPKMRSa8": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "UpdateStatusLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "QuickSightFederationFunctionLambdaFunction": {
@@ -508,14 +508,14 @@
         "LambdaBasicExecutionRole"
       ]
     }, 
-    "QuickSightFederationFunctionLambdaVersioniy7bpa49ToxDlzlypJRRjNiuLPeBwnfOTEmOZEDTA": {
+    "QuickSightFederationFunctionLambdaVersion6VHIXA1Ojng88XtFfXyxaIiv8eZ2ZVEgQ7BaEczyw": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "QuickSightFederationFunctionLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "CreateCallResolutionClassiferLambdaFunction": {
@@ -571,14 +571,14 @@
         "ComprehendFullAccessRole"
       ]
     }, 
-    "CreateCallResolutionClassiferLambdaVersionN7hVshVsTKqGBydvTmxTN6L7kScywlCyi9LbAaDcQA": {
+    "CreateCallResolutionClassiferLambdaVersionAtVmI2H7taQVN2S5Zkqvs9I9l7SOdjbdpfL4XObbWdk": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "CreateCallResolutionClassiferLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "CreateCallMotivationClassifierLambdaFunction": {
@@ -634,14 +634,14 @@
         "ComprehendFullAccessRole"
       ]
     }, 
-    "CreateCallMotivationClassifierLambdaVersionnjn8w8816N2pBpgPNJbciaXeBBfZ7N6eNxLDliKiY8": {
+    "CreateCallMotivationClassifierLambdaVersionXlQb7SS6rGJJQmAj3NvSkZGy9maWqtkip65YhL2ikU": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "CreateCallMotivationClassifierLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "CreateCallResolutionEndpointLambdaFunction": {
@@ -696,14 +696,14 @@
         "ComprehendFullAccessRole"
       ]
     }, 
-    "CreateCallResolutionEndpointLambdaVersionw1aXfjI1mFF7czI5jfarENZvha4zjIyDyEEOjFM": {
+    "CreateCallResolutionEndpointLambdaVersionUVQicfWZ5yuJkgg7QGF2UQANry9YpIHMcHcWW2MudA": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "CreateCallResolutionEndpointLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "CreateCallMotivationEndpointLambdaFunction": {
@@ -758,14 +758,14 @@
         "ComprehendFullAccessRole"
       ]
     }, 
-    "CreateCallMotivationEndpointLambdaVersionUCUGunn7LFiJkLwNLmlw0cASbpBDAfRsiNH5Kx1M": {
+    "CreateCallMotivationEndpointLambdaVersioniiv9kCq4Cj5drMSwnXEOyVUDDt6Zz19Vxa5Dw5FpQ": {
       "Type": "AWS::Lambda::Version", 
       "DeletionPolicy": "Retain", 
       "Properties": {
         "FunctionName": {
           "Ref": "CreateCallMotivationEndpointLambdaFunction"
         }, 
-        "CodeSha256": "lyz6HUtZFDp4qWY2bH1ZcWEE1AJo40WNoCfuZIeYaHQ="
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
       }
     }, 
     "CreateCallResolutionEndpointEventsRuleSchedule1": {
@@ -1970,7 +1970,7 @@
         "MethodResponses": []
       }
     }, 
-    "ApiGatewayDeployment1596050583782": {
+    "ApiGatewayDeployment1596054220864": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
@@ -4220,79 +4220,79 @@
     "TranscribeJobProducerLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "TranscribeJobProducerLambdaVersionGQeBDDE0UJ6Lmx9xNYTrDUhfF6m9pVUZuHGWlNKwkA"
+        "Ref": "TranscribeJobProducerLambdaVersionuUWpj61zZb74nAOOD5EyTU7Mimyd1NBSXAfqvmJRc"
       }
     }, 
     "SplitTranscriptLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "SplitTranscriptLambdaVersionqPTltlz0KrIIcQJGV98Dok4XPtDWEpe4czG8y1rNzc"
+        "Ref": "SplitTranscriptLambdaVersionjicBtPNhIW8Q153XZnDBoGL8bBy62UtlR9c8RXt0A"
       }
     }, 
     "AnalyseTextLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "AnalyseTextLambdaVersion05LN01XebMgSmAgMj2v3iG953viQmEYNb5Y09gmY"
+        "Ref": "AnalyseTextLambdaVersionNvpHFIoAeXib8hglMWXmpqwSoTkeIhLI7xr0qCjZCQY"
       }
     }, 
     "GetTranscriptsLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "GetTranscriptsLambdaVersiond50LvrpHmWjVpzisjqOBnWGgK3tlySEU8YR7iqco6k"
+        "Ref": "GetTranscriptsLambdaVersionBMDOKyLmd09AeFJkkEv3jxouUy11AJuMByh1W2XZo"
       }
     }, 
     "GetAudioLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "GetAudioLambdaVersionpi55sCjEtLpWimCa1YUklxgFZQektpb9iMNygJTRjU"
+        "Ref": "GetAudioLambdaVersionv1YDCft32Ul0AmTZp58GltKjVJrRxGfgETFsRGUTU"
       }
     }, 
     "GetSentimentLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "GetSentimentLambdaVersionzCU0lXHI7nk4uFKnvkHq8ztOAFMbnWF1jMqy5SUUM"
+        "Ref": "GetSentimentLambdaVersionjzGED65H96phijF85kKsVhZlRLhJ8DjWcDdIy4JfBA"
       }
     }, 
     "GetPresignedUrlLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "GetPresignedUrlLambdaVersiont6jVaeVgiBuCSWNm2f5uHrge1028xnShb9LSvMAFpA"
+        "Ref": "GetPresignedUrlLambdaVersionAMpaQh8shicDTvgQ2rikiB6qtBz8hTjju5G146cNb4"
       }
     }, 
     "UpdateStatusLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "UpdateStatusLambdaVersionQqX7JvwWAZFYNci70HcI1JyvlXswn8x7GBJS6taBg"
+        "Ref": "UpdateStatusLambdaVersionnWE4mHiwfU2XyL3E1BimFtdzXpe4lkKGEYLwPKMRSa8"
       }
     }, 
     "QuickSightFederationFunctionLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "QuickSightFederationFunctionLambdaVersioniy7bpa49ToxDlzlypJRRjNiuLPeBwnfOTEmOZEDTA"
+        "Ref": "QuickSightFederationFunctionLambdaVersion6VHIXA1Ojng88XtFfXyxaIiv8eZ2ZVEgQ7BaEczyw"
       }
     }, 
     "CreateCallResolutionClassiferLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "CreateCallResolutionClassiferLambdaVersionN7hVshVsTKqGBydvTmxTN6L7kScywlCyi9LbAaDcQA"
+        "Ref": "CreateCallResolutionClassiferLambdaVersionAtVmI2H7taQVN2S5Zkqvs9I9l7SOdjbdpfL4XObbWdk"
       }
     }, 
     "CreateCallMotivationClassifierLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "CreateCallMotivationClassifierLambdaVersionnjn8w8816N2pBpgPNJbciaXeBBfZ7N6eNxLDliKiY8"
+        "Ref": "CreateCallMotivationClassifierLambdaVersionXlQb7SS6rGJJQmAj3NvSkZGy9maWqtkip65YhL2ikU"
       }
     }, 
     "CreateCallResolutionEndpointLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "CreateCallResolutionEndpointLambdaVersionw1aXfjI1mFF7czI5jfarENZvha4zjIyDyEEOjFM"
+        "Ref": "CreateCallResolutionEndpointLambdaVersionUVQicfWZ5yuJkgg7QGF2UQANry9YpIHMcHcWW2MudA"
       }
     }, 
     "CreateCallMotivationEndpointLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version", 
       "Value": {
-        "Ref": "CreateCallMotivationEndpointLambdaVersionUCUGunn7LFiJkLwNLmlw0cASbpBDAfRsiNH5Kx1M"
+        "Ref": "CreateCallMotivationEndpointLambdaVersioniiv9kCq4Cj5drMSwnXEOyVUDDt6Zz19Vxa5Dw5FpQ"
       }
     }, 
     "ServiceEndpoint": {
