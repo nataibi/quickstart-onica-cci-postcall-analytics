@@ -1,0 +1,164 @@
+Resources:
+  GatewayResponseDefault4XX:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: DEFAULT_4XX
+      RestApiId:
+        Ref: Api
+  GatewayResponseDefault5XX:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: DEFAULT_5XX
+      RestApiId:
+        Ref: Api
+  Api:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name:
+        Fn::Join: 
+          - ''
+          - - api
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      BinaryMediaTypes:
+        - image/png
+        - image/jpg
+        - image/gif
+        - image/x-icon
+        - application/octet-stream
+  PortalBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      WebsiteConfiguration:
+        IndexDocument: !Ref DefaultRoot
+        ErrorDocument: !Ref ErrorPage
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment:
+          Ref: PortalBucket
+  PortalBucketReadPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: PortalBucket
+      PolicyDocument:
+        Statement:
+          - Action: 's3:GetObject'
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: PortalBucket
+                  - '/*'
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - PortalBucket
+    Properties:
+      DistributionConfig:
+        DefaultRootObject:
+          Fn::Join:
+            - ''
+            - - '/'
+              - Ref: DefaultRoot
+        Enabled: true
+        HttpVersion: http2
+        Origins:
+          - DomainName: !GetAtt PortalBucket.DomainName
+            Id: s3origin
+            S3OriginConfig:
+              OriginAccessIdentity:
+                Fn::Join:
+                  - ''
+                  - - 'origin-access-identity/cloudfront/'
+                    - Ref: CloudFrontOriginAccessIdentity
+          - DomainName:
+              Fn::Join:
+                - ''
+                - - Ref: Api
+                  - .execute-api.
+                  - Ref: AWS::Region
+                  - .amazonaws.com
+            CustomOriginConfig:
+              HTTPSPort: '443'
+              OriginProtocolPolicy: https-only
+            OriginPath: "/${self:provider.stage}"
+            Id: apigatewayorigin
+        PriceClass: PriceClass_All
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath:
+              Fn::Join:
+                - ''
+                - - '/'
+                  - Ref: DefaultRoot
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath:
+              Fn::Join:
+                - ''
+                - - '/'
+                  - Ref: DefaultRoot
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          Compress: true
+          DefaultTTL: 3600
+          ForwardedValues:
+            Cookies:
+              Forward: none
+            QueryString: false
+          MaxTTL: 86400
+          MinTTL: 60
+          TargetOriginId: s3origin
+          ViewerProtocolPolicy: 'redirect-to-https'
+        CacheBehaviors: #second the behavior for the API Gateway
+          - AllowedMethods: #allow all method for the backend to implement
+              - DELETE
+              - GET
+              - HEAD
+              - OPTIONS
+              - PATCH
+              - POST
+              - PUT
+            CachedMethods: #cache only on get requests
+              - GET
+              - HEAD
+              - OPTIONS
+            Compress: true
+            DefaultTTL: 5000
+            MaxTTL: 10000
+            MinTTL: 60
+            ForwardedValues:
+              Headers: #define explicit headers, since API Gateway doesn't work otherwise
+                - Accept
+                - Referer
+                - Authorization
+                - Content-Type
+              QueryString: true #to transfer get parameters to the gateway
+            PathPattern: "/api/*" #path pattern after the Gateway stage identifier.
+            TargetOriginId: apigatewayorigin #id of the orignin
+            ViewerProtocolPolicy: https-only #API Gateway only support https

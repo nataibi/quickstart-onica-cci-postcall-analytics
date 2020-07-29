@@ -1,0 +1,1 @@
+export default `{"asset_id":<AssetId>,"turns":<Turns>,"customer_entities":<CustomerEntities>,"customer_keyphrases":<CustomerKeyPhrases>,"agent_entities":<AgentEntities>,"agent_keyphrases":<AgentKeyPhrases>,"call_resolution_status":<CallResolutionStatus>,"call_motivation_status":<CallMotivationStatus>}`

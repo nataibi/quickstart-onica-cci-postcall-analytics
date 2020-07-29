@@ -1,0 +1,139 @@
+Resources:
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    DependsOn:
+     - Api
+    Properties:
+      AuthorizerResultTtlInSeconds: 300
+      IdentitySource: method.request.header.Authorization
+      Name:
+        Fn::Join:
+          - ''
+          - - cognito-authorizer
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      RestApiId:
+        Ref: Api
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+        - Fn::GetAtt:
+            - UserPool
+            - Arn
+  CognitoAuthUI:
+    Type: AWS::Cognito::UserPoolUICustomizationAttachment
+    Properties: 
+      ClientId: !Ref UserPoolClient
+      UserPoolId: !Ref UserPool
+  CognitoDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Ref UserPoolDomainName
+      UserPoolId: !Ref UserPool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName:
+        Fn::Join:
+          - ''
+          - - Ref: UserPoolName
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: userId
+          AttributeDataType: String
+          Mutable: true
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      RefreshTokenValidity: 30
+      ReadAttributes:
+        - family_name
+        - given_name
+        - email
+      WriteAttributes:
+        - family_name
+        - given_name
+        - email
+      AllowedOAuthFlows:
+        - code
+      SupportedIdentityProviders:
+        - COGNITO
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+        - profile
+        - email
+      CallbackURLs:
+        - Fn::Join:
+            - ''
+            - - 'https://'
+              - !GetAtt CloudFrontDistribution.DomainName
+              - '/login'
+      LogoutURLs:
+        - Fn::Join:
+            - ''
+            - - 'https://'
+              - !GetAtt CloudFrontDistribution.DomainName
+              - '/login'
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName:
+        Fn::Join:
+          - ''
+          - - Ref: IdentityPoolName
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId: !Ref UserPoolClient
+          ProviderName: !GetAtt UserPool.ProviderName
+          ServerSideTokenCheck: true  
+  QuickSightUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - ''
+          - - Ref: QuickSightUserRoleName
+            - _${self:provider.stage}_
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: Allow
+            Principal: 
+              Federated: cognito-identity.amazonaws.com
+            Action: 
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+      Policies:
+        - PolicyName: "QuickSightUserRolePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - 'quicksight:Create*'
+                  - 'quicksight:Describe*'
+                  - 'quicksight:Delete*'
+                  - 'quicksight:TagResource'
+                  - 'quicksight:PassDataSource'
+                  # required for quicksight - https://docs.aws.amazon.com/quicksight/latest/user/iam-policy-examples.html
+                Resource: '*' 
+  IdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated: !GetAtt QuickSightUserRole.Arn

@@ -1,0 +1,46 @@
+#!/bin/sh
+# TODO: Add support for multiple directories
+cd aws-icc
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+ESLINT="$GIT_ROOT/aws-icc/node_modules/.bin/eslint"
+MOCHA="$GIT_ROOT/aws-icc/node_modules/.bin/mocha"
+
+echo $ESLINT
+echo $GIT_ROOT
+
+# make sure eslint is installed
+if [[ ! -x "$ESLINT" ]]; then
+  echo "Please install ESlint: (npm install --save-dev eslint)"
+  exit 1
+fi
+
+# make sure we have something staged
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [[ "$STAGED_FILES" = "" ]]; then
+  exit 0
+fi
+
+$ESLINT "$GIT_ROOT/aws-icc/src/**/*.ts"
+
+ESLINT_EXIT="$?"
+
+if [[ "${ESLINT_EXIT}" == 0 ]]; then
+  printf "\n\033[42mCOMMIT SUCCEEDED\033[0m\n"
+else
+  printf "\n\033[41mCOMMIT FAILED:\033[0m Fix eslint errors and try again\n"
+  exit 1
+fi
+
+$MOCHA -r ts-node/register "$GIT_ROOT/aws-icc/**/*.spec.ts"
+
+MOCHA_EXIT="$?"
+
+if [[ "${MOCHA_EXIT}" == 0 ]]; then
+  printf "\n\033[42mCOMMIT SUCCEEDED\033[0m\n"
+else
+  printf "\n\033[41mCOMMIT FAILED:\033[0m Fix eslint errors and try again\n"
+  exit 1
+fi
+
+exit $?

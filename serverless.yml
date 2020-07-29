@@ -1,0 +1,450 @@
+service: aws-icc
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-webpack
+  - external-resource-files
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${env:DEPLOY_ENVIRONMENT}
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+  apiGateway:
+    restApiId:
+      Ref: Api
+    restApiRootResourceId:
+      Fn::GetAtt:
+        - Api
+        - RootResourceId
+
+functions:
+  #analysis
+  transcribeJobProducer:
+    handler: functions/source/transcribe/transcribeHandler.handler
+    role: TranscribeS3DynamoDBRole
+    environment:
+      TRANSCRIBE_OUTPUT_BUCKET:
+        Ref: TranscriptionOutput
+      CUSTOM_VOCABULARY_NAME:
+          Ref: CustomVocabularyName
+      TABLE_NAME:
+          Ref: StatusTable
+    events:
+      - s3:
+          existing: true
+          bucket:
+            Ref: TranscriptionAudioFiles
+          event: s3:ObjectCreated:*
+  splitTranscript:
+    handler: functions/source/analysis/splitTranscript.handler
+    role: TranscriptSplitterRole
+    environment:
+      SPLIT_TRANSCRIPT_OUTPUT_BUCKET:
+        Ref: SplitTranscriptOutput
+      TABLE_NAME:
+        Ref: StatusTable
+      AGENT_CHANNEL:
+        Ref: AgentChannel
+      AGENT_LABEL:
+        Ref: AgentSpeakerLabel
+    timeout: 120
+    events:
+      - s3:
+          existing: true
+          bucket:
+            Ref: TranscriptionOutput
+          event: s3:ObjectCreated:*
+  analyseText:
+    handler: functions/source/analysis/analyseTranscript.handler
+    role: ComprehendFullAccessRole
+    environment:
+      TEXT_ANALYSIS_OUTPUT_BUCKET:
+        Ref: TextAnalysisOutput
+      DATA_ACCESS_ROLE: !GetAtt TextAnalysisRole.Arn
+      TABLE_NAME:
+        Ref: StatusTable
+      CALL_RESOLUTION_ENDPOINT_ARN:
+        Fn::Join: 
+          - ''
+          - - 'arn:aws:comprehend:region:account-id:document-classifier-endpoint/'
+            - !Ref CallResolutionClassifierName
+            - 'Endpoint'   
+      CALL_MOTIVATION_ENDPOINT_ARN:
+        Fn::Join: 
+          - ''
+          - - 'arn:aws:comprehend:region:account-id:document-classifier-endpoint/'
+            - !Ref CallMotivationClassifierName
+            - 'Endpoint'
+      TOPIC_ARN:
+        Ref: ThreatNotificationTopic
+      AGENT_CHANNEL:
+        Ref: AgentChannel
+      AGENT_LABEL:
+        Ref: AgentSpeakerLabel
+    timeout: 120
+    events:
+      - s3:
+          existing: true
+          bucket:
+            Ref: SplitTranscriptOutput
+          event: s3:ObjectCreated:* 
+
+  #API
+  getTranscripts:
+    handler: functions/source/api/getTranscripts.handler
+    role: ScanTranscriptsRole
+    environment:
+      TABLE_NAME:
+        Ref: StatusTable
+      AGENT_CHANNEL:
+        Ref: AgentChannel
+      AGENT_LABEL:
+        Ref: AgentSpeakerLabel
+    timeout: 120
+    events:
+      - http:
+          method: GET
+          path: /api/transcripts
+          cors: true
+          request:
+            parameters:
+              headers:
+                authorization: false
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - email
+              - openid
+  getAudio:
+    handler: functions/source/api/getAudio.handler
+    role: TranscriptionAudioFilesRole
+    environment:
+      BUCKET_NAME:
+        Fn::Join: 
+          - ''
+          - - transcription-audio-files
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+    events:
+      - http:
+          method: GET
+          path: /api/audio
+          cors: true
+          request:
+            parameters:
+              headers:
+                authorization: false
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - email
+              - openid
+  getSentiment:
+    handler: functions/source/api/getSentiments.handler
+    role: GetSentimentsRole
+    environment:
+      BUCKET:
+        Fn::Join:
+          - ''
+          - - text-analysis-output
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+    events:
+      - http:
+          method: GET
+          path: /api/sentiment
+          cors: true
+          request:
+            parameters:
+              headers:
+                authorization: false
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - email
+              - openid
+  getPresignedUrl:
+    handler: functions/source/api/getPresignedUrl.handler
+    role: TranscriptionAudioFilesRole
+    environment:
+      BUCKET_NAME:
+        Fn::Join: 
+          - ''
+          - - transcription-audio-files
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      TOKEN_ENDPOINT:
+        Fn::Join:
+          - ''
+          - - https://
+            - Ref: CognitoDomain
+            - .auth.region.amazoncognito.com/oauth2/userInfo
+    events:
+      - http:
+          path: /api/presigned
+          method: POST
+          cors: true
+          request:
+            parameters:
+              headers:
+                authorization: false
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - email
+              - openid
+  updateStatus:
+    handler: functions/source/api/updateStatus.handler
+    role: DynamoBatchWriteRole
+    environment:
+      TABLE_NAME:
+        Ref: StatusTable
+      TOKEN_ENDPOINT:
+        Fn::Join:
+          - ''
+          - - https://
+            - Ref: CognitoDomain
+            - .auth.region.amazoncognito.com/oauth2/userInfo
+    events:
+      - http:
+          path: /api/status
+          method: POST
+          cors: true
+          request:
+            parameters:
+              headers:
+                authorization: false
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - email
+              - openid
+  quickSightFederationFunction:
+    handler: functions/source/api/quicksightAuth.handler
+    role: LambdaBasicExecutionRole
+    events:
+      - http:
+          method: POST
+          path: /auth
+          cors: true
+          request:
+            parameters:
+              headers:
+                authorization: false
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+            scopes:
+              - email
+              - openid
+  
+  #classifiers and endpoints
+  createCallResolutionClassifer:
+    handler: functions/source/classifiers/callResolutionClassifier.handler
+    role: ComprehendFullAccessRole
+    environment:
+      DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
+      CLASSIFIER_NAME: 
+        Ref: CallResolutionClassifierName
+      CALL_RESOLUTION_BUCKET:
+        Fn::Join: 
+          - ''
+          - - comprehend-call-resolution  
+            - -${self:provider.stage}-   
+            - Ref: ServicePrefix
+
+    timeout: 900
+    events:
+      - s3:
+          existing: true
+          bucket:
+            Ref: ComprehendCallResolutionBucket
+          event: s3:ObjectCreated:*
+  createCallMotivationClassifier:
+    handler: functions/source/classifiers/createMotivationClassifier.handler
+    role: ComprehendFullAccessRole
+    environment:
+      DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
+      CLASSIFIER_NAME: 
+        Ref: CallMotivationClassifierName
+      CALL_MOTIVATION_INPUT:
+        Fn::Join: 
+          - ''
+          - - comprehend-call-motivation
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+    timeout: 900
+    events:
+      - s3:
+          existing: true
+          bucket:
+            Ref: ComprehendCallMotivationBucket
+          event: s3:ObjectCreated:*
+  createCallResolutionEndpoint:
+    handler: functions/source/endpoints/callResolutionEnpoint.handler
+    role: ComprehendFullAccessRole
+    environment:
+      DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
+      CLASSIFIER_NAME: 
+        Ref: CallResolutionClassifierName
+      CALL_RESOLUTION_ARN:
+        Fn::Join: 
+          - ''
+          - - 'arn:aws:comprehend:region:account-id:document-classifier/'
+            - !Ref CallResolutionClassifierName      
+    timeout: 120
+    events: 
+      - schedule: rate(3 minutes)
+  createCallMotivationEndpoint:
+    handler: functions/source/endpoints/createMotivationEndpoint.handler
+    role: ComprehendFullAccessRole
+    environment:
+      DATA_ACCESS_ROLE: !GetAtt ComprehendDataAccessRole.Arn
+      CLASSIFIER_NAME:
+        Ref: CallMotivationClassifierName
+      CALL_MOTIVATION_ARN:
+        Fn::Join:
+          - ''
+          - - 'arn:aws:comprehend:region:account-id:document-classifier/'
+            - !Ref CallMotivationClassifierName      
+    timeout: 120
+    events:
+      - schedule: rate(3 minutes)
+
+resources:
+  Parameters:
+    AgentChannel:
+      Type: Number
+      Default: 0
+      Description: Left(0), or Right(1). Customer will be set to the other channel.
+    AgentSpeakerLabel:
+      Type: Number
+      Default: 0
+      Description: First speaker(0) or last speaker(1). Customer will be set to the other label.
+    ServicePrefix:
+      Type: String
+      Default: aws-icc
+      Description: A prefix to make resource names unique
+    CustomVocabularyName: 
+      Type: String
+      Default: custom-vocabulary
+      Description: The name of the Amazon Transcribe Custom Vocabulary
+    CallResolutionClassifierName: 
+      Type: String
+      Default: call-resolution
+      Description: The name of the Call Resolution Classifier
+    CallMotivationClassifierName:
+      Type: String
+      Default: call-motivation
+      Description: The name of the Call Motivation Classifier
+    UserPoolName:
+      Type: String
+      Default: MyUserPool
+    UserPoolDomainName:
+      Type: String
+      Default: icc-${self:provider.stage}
+    IdentityPoolName:
+      Type: String
+      Default: MyIdentityPool
+    QuickSightUserRoleName:
+      Type: String
+      Default: QuickSightUserRole
+    QuickSightUserName:
+      Type: String
+      Default: dkubi
+    UserPolicyName:
+      Type: String
+      Default: MyUserPolicy
+    AllowedOrigins:
+      Type: List<String>
+      Default: '*'
+    DefaultRoot:
+      Description: 'The default path for the index document.'
+      Type: String
+      Default: 'index.html'
+    ErrorPage:
+      Description: 'The path of the error page for the website.'
+      Type: String
+      Default: 'error.html'
+    NotificationEmail:
+      Type: String
+      Default: 'test@example.com'
+    QSS3KeyPrefix:
+      Type: String
+      Default: quickstart-onica-post-call-analytics/
+
+  externalResourceFiles:
+    - ${file(templates/roles.template.yaml)}
+    - ${file(templates/auth-resources.template.yaml)}
+    - ${file(templates/pca-resources.template.yaml)}
+    - ${file(templates/cleanup.template.yaml)}
+    - ${file(templates/portal.template.yaml)}
+
+  Outputs:
+    Stage:
+      Value: ${self:provider.stage}
+    ApiGatewayDomain:
+      Value:
+        Fn::Join:
+          - ''
+          - - Ref: Api
+            - .execute-api.
+            - Ref: AWS::Region
+            - .amazonaws.com
+    CognitoDomain:
+      Value: !Sub "#{CognitoDomain}.auth.#{AWS::Region}.amazoncognito.com"
+    UserPoolId:
+      Value:
+        Ref: UserPool
+    UserPoolClientId:
+      Value:
+        Ref: UserPoolClient
+    IdentityPoolId:
+      Value:
+        Ref: IdentityPool
+    TranscriptionAudioFiles:
+      Value:
+        Ref: TranscriptionAudioFiles
+    ComprehendCallResolutionBucket:
+      Value:
+        Ref: ComprehendCallResolutionBucket
+    ComprehendCallMotivationBucket:
+      Value:
+        Ref: ComprehendCallMotivationBucket
+    UserPoolArn:
+      Value: !GetAtt UserPool.Arn
+    QuickSightUserRoleArn:
+      Value: !GetAtt QuickSightUserRole.Arn
+    PortalBucket:
+      Value:
+        Ref: PortalBucket
+    PortalBucketArn:
+      Value: !GetAtt PortalBucket.Arn
+    CloudFrontDistributionId:
+      Value:
+        Ref: CloudFrontDistribution
+    CloudFrontDistributionName:
+      Value: !GetAtt CloudFrontDistribution.DomainName
+    UserPoolClient:
+      Value:
+        Ref: UserPoolClient
+    ServicePrefix:
+      Value: !Ref ServicePrefix
