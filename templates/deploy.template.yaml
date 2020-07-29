@@ -1,0 +1,182 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template copies the custom vocabulary file to the destination bucket
+Parameters:
+  QSS3BucketName:
+    Default: ""
+    Type: String
+  QSS3KeyPrefix:
+    Default: ""
+    Type: String
+  TranscriptionAudioFiles:
+    Default: ""
+    Type: String
+  ComprehendCallResolutionBucket:
+    Default: ""
+    Type: String
+  ComprehendCallMotivationBucket:
+    Default: ""
+    Type: String
+  Nonce:
+    Default: "1"
+    Type: String
+    Description: Change to any value re-copy source upon deployment
+
+Resources:
+  CopyObjectsRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - s3:GetObject
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*
+              - Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketVersions
+                  - s3:DeleteObjectVersion
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::${TranscriptionAudioFiles}/*
+                  - Fn::Sub: arn:aws:s3:::${TranscriptionAudioFiles}
+                  - Fn::Sub: arn:aws:s3:::${ComprehendCallResolutionBucket}/*
+                  - Fn::Sub: arn:aws:s3:::${ComprehendCallResolutionBucket}
+                  - Fn::Sub: arn:aws:s3:::${ComprehendCallMotivationBucket}/*
+                  - Fn::Sub: arn:aws:s3:::${ComprehendCallMotivationBucket}
+            Version: '2012-10-17'
+          PolicyName: object-copier
+    Type: AWS::IAM::Role
+  TranscribeUpload:
+    Properties:
+      ServiceToken: !GetAtt CopyObjectsFunction.Arn
+      Nonce: !Ref Nonce
+      DestBucket: !Ref TranscriptionAudioFiles
+      Objects:
+        - transcribe/vocabulary.txt
+      SourceBucket: !Ref QSS3BucketName
+      Prefix: !Ref QSS3KeyPrefix
+    Type: AWS::CloudFormation::CustomResource
+  CopyCallResolutionObjects:
+    Properties:
+      ServiceToken: !GetAtt CopyObjectsFunction.Arn
+      Nonce: !Ref Nonce
+      DestBucket: !Ref ComprehendCallResolutionBucket
+      Objects:
+        - training/resolution/train.csv
+      SourceBucket: !Ref QSS3BucketName
+      Prefix: !Ref QSS3KeyPrefix
+    Type: AWS::CloudFormation::CustomResource
+  CopyCallMotivationObjects:
+    Properties:
+      ServiceToken: !GetAtt CopyObjectsFunction.Arn
+      Nonce: !Ref Nonce
+      DestBucket: !Ref ComprehendCallMotivationBucket
+      Objects:
+        - training/motivation/training.csv
+      SourceBucket: !Ref QSS3BucketName
+      Prefix: !Ref QSS3KeyPrefix
+    Type: AWS::CloudFormation::CustomResource
+  CopyObjectsFunction:
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import threading
+          import boto3
+          import cfnresponse
+
+
+          def copy_objects(source_bucket, dest_bucket, prefix, objects):
+              s3 = boto3.client('s3')
+              for o in objects:
+                  key = o.replace("dist/", "").replace("transcribe/", "")
+                  print(key)
+                  print(prefix + o)
+                  copy_source = {
+                      'Bucket': source_bucket,
+                      'Key': prefix + o
+                  }
+                  s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)
+
+
+          def delete_objects(bucket):
+              client = boto3.client('s3')
+              print("Collecting data from" + bucket)
+              paginator = client.get_paginator('list_object_versions')
+              result = paginator.paginate(Bucket=bucket)
+              objects = []
+              for page in result:
+                  try:
+                      for k in page['Versions']:
+                          objects.append({'Key': k['Key'], 'VersionId': k['VersionId']})
+                      try:
+                          for k in page['DeleteMarkers']:
+                              version = k['VersionId']
+                              key = k['Key']
+                              objects.append({'Key': key, 'VersionId': version})
+                      except Exception as e:
+                          print(e)
+                          pass
+                      print("deleting objects")
+                      client.delete_objects(Bucket=bucket, Delete={'Objects': objects})
+                  except Exception as e:
+                      print(e)
+                      pass
+              print("bucket already empty")
+
+
+          def timeout(event, context):
+              logging.error('Execution is about to time out, sending failure response to CloudFormation')
+              cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
+
+
+          def handler(event, context):
+              # make sure we send a failure to CloudFormation if the function is going to timeout
+              timer = threading.Timer((context.get_remaining_time_in_millis() / 1000.00) - 0.5, timeout, args=[event, context])
+              timer.start()
+
+              print('Received event: %s' % json.dumps(event))
+              status = cfnresponse.SUCCESS
+              try:
+                  source_bucket = event['ResourceProperties']['SourceBucket']
+                  dest_bucket = event['ResourceProperties']['DestBucket']
+                  prefix = event['ResourceProperties']['Prefix']
+                  objects = event['ResourceProperties']['Objects']
+                  if event['RequestType'] == 'Delete':
+                      delete_objects(dest_bucket)
+                  else:
+                      copy_objects(source_bucket, dest_bucket, prefix, objects)
+              except Exception as e:
+                  logging.error('Exception: %s' % e, exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  timer.cancel()
+                  cfnresponse.send(event, context, status, {}, None)
+
+      Description: Copies objects from a source S3 bucket to a destination S3 bucket
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CopyObjectsRole
+          - Arn
+      Runtime: python2.7
+      Timeout: 240
+    Type: AWS::Lambda::Function
