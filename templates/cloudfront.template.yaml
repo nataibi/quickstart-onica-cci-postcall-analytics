@@ -1,0 +1,457 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Call AnalyticsPortal Stack
+Parameters:
+  DefaultRoot:
+    Description: 'The default path for the index document.'
+    Type: String
+    Default: 'index.html'
+  ErrorPage:
+    Description: 'The path of the error page for the website.'
+    Type: String
+    Default: 'error.html'
+  BaseApi:
+    Type: String
+    Default: ''
+  ApiGatewayApiKey:
+    Type: String
+    Default: ''
+  QSS3BucketName:
+    Default: ''
+    Type: String
+  QSS3KeyPrefix:
+    Default: ""
+    Type: String
+  UserPoolArn:
+    Type: String
+  UserPoolId:
+    Description: "Cognito user pool's id used for authentication"
+    Type: String
+  IdentityPoolId:
+    Type: String
+  CognitoDomain:
+    Description: "Cognito domain"
+    Type: String
+  ApiGatewayDomain:
+    Description: "Domain for the REST API"
+    Type: String
+  Stage:
+    Description: "Stage for deployment"
+    Type: String
+  Nonce:
+    Default: "1"
+    Type: String
+    Description: Change to any value re-copy source upon deployment
+  PortalBucket:
+    Default: ""
+    Type: String
+  PortalBucketArn:
+    Default: ""
+    Type: String
+  CloudFrontDistributionId:
+    Default: ""
+    Type: String
+  CloudFrontDistributionName:
+    Default: ""
+    Type: String
+  UserPoolClient:
+    Default: ""
+    Type: String
+Resources:
+  CopyObjects:
+    DependsOn:
+      - CleanUpS3Bucket
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      Nonce: !Ref Nonce
+      ServiceToken: !GetAtt CopyObjectsFunction.Arn
+      SourceBucket: !Ref QSS3BucketName
+      DestBucket: !Ref PortalBucket
+      SourcePrefixKey: !Sub '${QSS3KeyPrefix}portal/'
+      BaseApi: !Ref BaseApi
+      ApiGatewayApiKey: !Ref ApiGatewayApiKey
+      DistributionId: !Ref CloudFrontDistributionId
+      CognitoDomain: !Ref CognitoDomain
+      UserPoolId: !Ref UserPoolId
+      IdentityPoolId: !Ref IdentityPoolId
+      ClientId: !Ref UserPoolClient
+      RedirDomain: !Sub https://${CloudFrontDistributionName}/login
+  CopyObjectsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.7
+      Timeout: 240
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CopyObjectsRole
+          - Arn
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import threading
+          import boto3
+          import cfnresponse
+          import uuid
+
+          s3r = boto3.resource('s3')
+          s3c = boto3.client('s3')
+          agw = boto3.client('apigateway')
+          cfr = boto3.client('cloudfront')
+
+
+          def copy_objects(src_bucket, dest_bucket, prefix, base_api, cognito_domain, user_pool_id, client_id, identity_pool_id, redir_domain):
+              files = s3c.list_objects(Bucket=src_bucket, Prefix=prefix)['Contents']
+              for key in files:
+                  file_key = key['Key']
+                  if file_key.startswith(prefix + 'static') and (file_key.endswith('js') or file_key.endswith('map')):
+                      obj = s3r.Object(src_bucket, file_key)
+                      data = obj.get()['Body'].read().decode('utf-8').replace('__BASE_API__', base_api).replace('__C_DOMAIN__', cognito_domain).replace('__C_POOL__', user_pool_id).replace('__C_CLIENT_ID__', client_id).replace('__CID_POOL__', identity_pool_id).replace('__C_REDIR__', redir_domain)
+                      s3c.put_object(Body=data, Bucket=dest_bucket, Key=file_key.replace(prefix, ''),
+                                     ContentType='application/javascript')
+                  else:
+                      s3r.meta.client.copy({'Bucket': src_bucket, 'Key': file_key}, dest_bucket, file_key.replace(prefix, ''))
+
+
+          def invalidate(dist_id, items):
+              ib = {'CallerReference': str(uuid.uuid4()), 'Paths': {'Quantity': len(items), 'Items': items}}
+              cfr.create_invalidation(DistributionId=dist_id, InvalidationBatch=ib)
+
+
+          def delete_objects(bucket):
+              paginator = s3c.get_paginator('list_object_versions')
+              result = paginator.paginate(Bucket=bucket)
+              objects = []
+              for page in result:
+                  try:
+                      for k in page['Versions']:
+                          objects.append({'Key': k['Key'], 'VersionId': k['VersionId']})
+                      try:
+                          for k in page['DeleteMarkers']:
+                              version = k['VersionId']
+                              key = k['Key']
+                              objects.append({'Key': key, 'VersionId': version})
+                      except:
+                          pass
+                      s3c.delete_objects(Bucket=bucket, Delete={'Objects': objects})
+                  except:
+                      pass
+
+
+          def timeout(event, context):
+              logging.error('Execution is about to time out, sending failure response to CloudFormation')
+              cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
+
+
+          def handler(event, context):
+              timer = threading.Timer((context.get_remaining_time_in_millis() / 1000.00) - 0.5, timeout, args=[event, context])
+              timer.start()
+
+              status = cfnresponse.SUCCESS
+              try:
+                  resource = event['ResourceProperties']
+                  src_bucket = resource['SourceBucket']
+                  dest_bucket = resource['DestBucket']
+                  prefix = resource['SourcePrefixKey']
+                  base_api = resource['BaseApi']
+                  dist_id = resource['DistributionId']
+                  cognito_domain = resource['CognitoDomain']
+                  user_pool_id = resource['UserPoolId']
+                  identity_pool_id = resource['IdentityPoolId']
+                  client_id = resource['ClientId']
+                  redir_domain = resource['RedirDomain']
+                  if event['RequestType'] == 'Delete':
+                      delete_objects(dest_bucket)
+                  else:
+                      invalidate(dist_id, ['/*'])
+                      copy_objects(src_bucket, dest_bucket, prefix, base_api, cognito_domain, user_pool_id, client_id, identity_pool_id, redir_domain)
+              except Exception as e:
+                  logging.error('Exception: %s' % e, exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  timer.cancel()
+                  cfnresponse.send(event, context, status, {}, None)
+  CopyObjectsRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                  - cloudfront:ListInvalidations
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                  - apigateway:GET
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:apigateway:${AWS::Region}::/apikeys/${ApiGatewayApiKey}
+              - Action:
+                  - s3:ListBucket
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::${QSS3BucketName}
+              - Action:
+                  - s3:GetObject
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::${QSS3BucketName}/*
+              - Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketVersions
+                  - s3:DeleteObjectVersion
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::${PortalBucket}/*
+                  - Fn::Sub: arn:aws:s3:::${PortalBucket}
+            Version: '2012-10-17'
+          PolicyName: object-copier
+    Type: AWS::IAM::Role
+  CleanUpS3Bucket:
+    Properties:
+      DestBucket:
+        Ref: PortalBucket
+      ServiceToken:
+        Fn::GetAtt:
+          - CleanUpS3BucketFunction
+          - Arn
+    Type: AWS::CloudFormation::CustomResource
+  CleanUpS3BucketFunction:
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import threading
+          import boto3
+          import cfnresponse
+
+          s3c = boto3.client('s3')
+
+
+          def delete_non_versioned_objects(bucket):
+              print("Collecting data from" + bucket)
+              paginator = s3c.get_paginator('list_objects_v2')
+              result = paginator.paginate(Bucket=bucket)
+              objects = []
+              for page in result:
+                  try:
+                      for k in page['Contents']:
+                          objects.append({'Key': k['Key']})
+                          print("deleting objects")
+                          s3c.delete_objects(Bucket=bucket, Delete={'Objects': objects})
+                          objects = []
+                  except Exception as e:
+                      print(e)
+
+
+          def delete_versioned_objects(bucket):
+              print("Collecting data from" + bucket)
+              paginator = s3c.get_paginator('list_object_versions')
+              result = paginator.paginate(Bucket=bucket)
+              objects = []
+              for page in result:
+                  try:
+                      for k in page['Versions']:
+                          objects.append({'Key': k['Key'], 'VersionId': k['VersionId']})
+                      try:
+                          for k in page['DeleteMarkers']:
+                              version = k['VersionId']
+                              key = k['Key']
+                              objects.append({'Key': key, 'VersionId': version})
+                      except Exception as e:
+                          print(e)
+                      print("deleting objects")
+                      s3c.delete_objects(Bucket=bucket, Delete={'Objects': objects})
+                  except Exception as e:
+                      print(e)
+
+
+          def timeout(event, context):
+              logging.error('Execution is about to time out, sending failure response to CloudFormation')
+              cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
+
+
+          def handler(event, context):
+              # make sure we send a failure to CloudFormation if the function is going to timeout
+              timer = threading.Timer((context.get_remaining_time_in_millis() / 1000.00) - 0.5, timeout, args=[event, context])
+              timer.start()
+
+              print('Received event: %s' % json.dumps(event))
+              status = cfnresponse.SUCCESS
+              try:
+                  dest_bucket = event['ResourceProperties']['DestBucket']
+                  if event['RequestType'] == 'Delete':
+                      check_if_versioned = s3c.get_bucket_versioning(Bucket=dest_bucket)
+                      print(check_if_versioned)
+                      if 'Status' in check_if_versioned:
+                          print(check_if_versioned['Status'])
+                          print("This is a versioned Bucket")
+                          delete_versioned_objects(dest_bucket)
+                      else:
+                          print("This is not a versioned bucket")
+                          delete_non_versioned_objects(dest_bucket)
+                  else:
+                      print("Nothing to do")
+              except Exception as e:
+                  logging.error('Exception: %s' % e, exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  timer.cancel()
+                  cfnresponse.send(event, context, status, {}, None)
+
+      Description: Empty the S3 Bucket
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - S3CleanUpRole
+          - Arn
+      Runtime: python2.7
+      Timeout: 240
+    Type: AWS::Lambda::Function
+  S3CleanUpRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketVersions
+                  - s3:DeleteObjectVersion
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+                Effect: Allow
+                Resource:
+                  - Ref: PortalBucketArn
+                  - Fn::Sub: arn:aws:s3:::*
+            Version: '2012-10-17'
+          PolicyName: Empty-bucket
+    Type: AWS::IAM::Role
+  UserPoolCustomizationLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.7
+      Timeout: 240
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CognitoCustomizeRole
+          - Arn
+      Code:
+        ZipFile: |
+          import base64
+          import boto3
+          import cfnresponse
+          import traceback
+
+          idp = boto3.client('cognito-idp')
+
+          def handler(event, context):
+            prop = event['ResourceProperties']
+            request_type = event['RequestType']
+
+            try:
+              if request_type == "Create":
+                idp.set_ui_customization(UserPoolId=prop['UserPoolId'], ClientId=prop['ClientId'], CSS=prop['CSS'], ImageFile=base64.decodebytes(prop['ImageFile'].encode('utf-8')))
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, None)
+              else:
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, None)
+            except Exception as e:
+              traceback.print_exc()
+              cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
+
+  UserPoolHostUICustomization:
+    Type: Custom::UserPoolCustomization
+    Properties:
+      ServiceToken:
+        Fn::GetAtt: [UserPoolCustomizationLambdaFunction, Arn]
+      ClientId: !Ref UserPoolClient
+      ImageFile: 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
+      CSS: |
+        .banner-customizable {
+          background-color: #fff;
+        }
+
+        .submitButton-customizable {
+          background-color: #3d4e62;
+        }
+
+        .submitButton-customizable:hover {
+          background-color: rgb(42, 54, 68);
+        }
+
+        .errorMessage-customizable {
+          border: none;
+          background: #fff;
+        }
+      UserPoolId: !Ref UserPoolId
+  CognitoCustomizeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: "/"
+      Policies:
+        - PolicyName: cognito-customization
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                  - cloudfront:ListInvalidations
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                  - cognito-idp:SetUICustomization
+                Effect: Allow
+                Resource: !Ref UserPoolArn
+Outputs:
+  DefaultRoot:
+    Value: !Ref DefaultRoot
+  ErrorPage:
+    Value: !Ref ErrorPage
+  PortalBucketName:
+    Value: !Ref PortalBucket
+  PortalBucketRegion:
+    Value: !Ref "AWS::Region"
+  DistributionId:
+    Value: !Ref CloudFrontDistributionId
+  DistributionDomainName:
+    Value: !Ref CloudFrontDistributionName

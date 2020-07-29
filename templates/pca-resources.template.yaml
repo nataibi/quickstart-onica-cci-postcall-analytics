@@ -1,0 +1,336 @@
+Resources:   
+  ComprehendCallResolutionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join: 
+          - ''
+          - - comprehend-call-resolution
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+  ComprehendCallMotivationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join: 
+          - ''
+          - - comprehend-call-motivation 
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+
+  TranscriptionOutput:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join: 
+          - ''
+          - - transcription-output 
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+  TranscriptionAudioFiles:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - ''
+          - - transcription-audio-files
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods: 
+              - PUT
+            AllowedOrigins: 
+              - '*'
+
+  StatusTable: 
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName:
+        Fn::Join: 
+          - ''
+          - - jobStatus
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AttributeDefinitions:
+        - AttributeName: jobId
+          AttributeType: S
+        - AttributeName: audioURI
+          AttributeType: S
+        - AttributeName: transcriptURI
+          AttributeType: S
+        - AttributeName: lastModified
+          AttributeType: S
+        - AttributeName: transcriptionJobName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jobId
+          KeyType: HASH
+        - AttributeName: lastModified
+          KeyType: RANGE
+      LocalSecondaryIndexes:
+        - IndexName: audioLSI
+          KeySchema:
+            - AttributeName: jobId
+              KeyType: HASH
+            - AttributeName: audioURI
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: transcriptLSI
+          KeySchema:
+            - AttributeName: jobId
+              KeyType: HASH
+            - AttributeName: transcriptURI
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      GlobalSecondaryIndexes:
+        - IndexName: jobStatusGSI
+          KeySchema:
+            - AttributeName: transcriptionJobName
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  SplitTranscriptOutput:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join: 
+          - ''
+          - - split-transcript-output
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+  TextAnalysisOutput:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - ''
+          - - text-analysis-output
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+
+  TranscriptionAudioFilesPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName:
+        Fn::Join:
+          - ''
+          - - get-presignedurl-policy
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:Put*'
+              - 's3:ListBucket'
+              - 's3:Get*'
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - transcription-audio-files-${self:provider.stage}-
+                    - Ref: ServicePrefix
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - transcription-audio-files-${self:provider.stage}-
+                    - Ref: ServicePrefix
+                    - '/*'
+  TextAnalysisPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName:
+        Fn::Join:
+          - ''
+          - - text-analysis-policy
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:Put*'
+              - 's3:ListBucket'
+              - 's3:Get*'
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - text-analysis-output-${self:provider.stage}-
+                    - Ref: ServicePrefix
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - text-analysis-output-${self:provider.stage}-
+                    - Ref: ServicePrefix
+                    - '/*'
+  TextAnalysisDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: 
+          Fn::Join: 
+            - ''
+            - - text_analysis_database
+              - -${self:provider.stage}-
+              - Ref: ServicePrefix
+        Description: "AWS Glue container to hold metadata tables for the text analysis crawler"
+  TextAnalysisMetadataCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: 
+        Fn::Join: 
+          - ''
+          - - text-analysis-metadata-crawler
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix      
+      Role: !GetAtt TextAnalysisResultCrawlerRole.Arn
+      #Classifiers: none, use the default classifier
+      Description: AWS Glue crawler to crawl text analysis results
+      Schedule: 
+        ScheduleExpression: cron(0/59 * * * ? *)
+      DatabaseName: !Ref TextAnalysisDatabase
+      Targets:
+        S3Targets:
+          - Path: !Ref TextAnalysisOutput
+      SchemaChangePolicy:
+        UpdateBehavior: "UPDATE_IN_DATABASE"
+        DeleteBehavior: "LOG"
+      Configuration: "{\"Version\":1.0,\"CrawlerOutput\":{\"Partitions\":{\"AddOrUpdateBehavior\":\"InheritFromTable\"},\"Tables\":{\"AddOrUpdateBehavior\":\"MergeNewColumns\"}}}"
+  TextAnalysisAthena:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 
+        Fn::Join: 
+          - ''
+          - - text-analysis-athena-results
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+
+  FetchTurnByTurnSentimentsNamedQuery:
+    Type: AWS::Athena::NamedQuery
+    Properties:
+      Database: !Ref TextAnalysisDatabase
+      Description: "A query that selects turn by turn sentiments"
+      Name: "Select Turn by turn sentiments"
+      QueryString:
+        Fn::Join:
+          - ''
+          - - 'WITH dataset AS (
+              select asset_id as id, call_resolution_status as resolution, call_motivation_status as motivation, turns
+              from '
+            - '"text_analysis_database-${self:provider.stage}-'
+            - Ref: ServicePrefix
+            - '"."'
+            - 'text_analysis_output_${self:provider.stage}_'
+            - !Join ["_", !Split ["-", !Ref ServicePrefix] ]
+            - '"'
+            - ') select id, turn.turn, turn.channel, resolution, motivation, turn.sentiment.Sentiment, turn.sentiment.SentimentScore, turn.text
+                from dataset
+                cross join unnest(turns) t(turn)'
+  ComprehendFullAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName:
+        Fn::Join: 
+          - ''
+          - - comprehend-full-access-policy
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:Put*'
+              - 's3:ListBucket'
+              - 's3:Get*'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource: '*'
+              
+          - Effect: Allow
+            Action:
+              - comprehend:Create*
+              - comprehend:Describe*
+              - comprehend:Batch*
+              - comprehend:Delete*
+              - comprehend:Detect*
+              - comprehend:List*
+              - comprehend:Start*
+              - comprehend:Stop*
+              - comprehend:ClassifyDocument
+            # required for comprehend -https://docs.aws.amazon.com/comprehend/latest/dg/access-control-overview.html
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - events:Disable*
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - dynamodb:*
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:dynamodb:'
+                  - Ref: AWS::Region
+                  - :#{AWS::AccountId}:table/
+                  - Ref: StatusTable
+          - Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource:
+              - !GetAtt ComprehendDataAccessRole.Arn
+              - !GetAtt TextAnalysisRole.Arn
+
+  SnsNotificationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName:
+        Fn::Join: 
+          - ''
+          - - sns-notification
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sns:*
+            Resource:
+              - Ref: ThreatNotificationTopic
+  ThreatNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      Subscription:
+        - Endpoint: !Ref NotificationEmail
+          Protocol: email
+      DisplayName:
+        Fn::Join:
+          - ''
+          - - threat-notification
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      TopicName:
+        Fn::Join:
+          - ''
+          - - threat-notification
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix

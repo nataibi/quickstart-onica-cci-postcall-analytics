@@ -1,0 +1,293 @@
+Resources:
+  LambdaBasicExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - basic-execution
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  TranscribeS3DynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - transcribe-s3-dynamo-full-access 
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonTranscribeFullAccess
+        - !Ref TranscriptionAudioFilesPolicy
+      Policies:
+        - PolicyName: UpdateDynamoDBAndTranscribeOutputPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:Update*'
+                Resource: 
+                  - !GetAtt StatusTable.Arn
+              - Effect: Allow
+                Action:
+                  - 's3:Put*'
+                  - 's3:ListBucket'
+                  - 's3:Get*'
+                Resource:
+                  - Fn::Join:
+                      - ''
+                      - - 'arn:aws:s3:::'
+                        - transcription-output-${self:provider.stage}-
+                        - Ref: ServicePrefix
+                  - Fn::Join:
+                      - ''
+                      - - 'arn:aws:s3:::'
+                        - transcription-output-${self:provider.stage}-
+                        - Ref: ServicePrefix
+                        - '/*'
+  DynamoBatchWriteRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - dynamodb-batch-write-role 
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ScanDynamoDBPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:batchWrite'
+                Resource: 
+                  - !GetAtt StatusTable.Arn
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:BatchWriteItem'
+                Resource: 
+                  - !GetAtt StatusTable.Arn
+  S3ReadOnlyAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - s3-readonly-access 
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+  TranscriptionAudioFilesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - transcription-audio-files
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref TranscriptionAudioFilesPolicy
+  ScanTranscriptsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - scan-transcripts
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ScanDynamoDBPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:Scan'
+                Resource: 
+                  - !GetAtt StatusTable.Arn
+  TranscriptSplitterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - ''
+          - - split-transcript-role
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+  GetSentimentsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - ''
+          - - get-sentiments-role
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - !Ref TextAnalysisPolicy
+  TextAnalysisRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - ''
+          - - text-analysis-role
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - comprehend.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref TextAnalysisPolicy
+  TextAnalysisResultCrawlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "glue.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "TextAnalysisResultCrawlerRolePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+  ComprehendFullAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - comprehend-full-access-role 
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref ComprehendFullAccessPolicy
+        - !Ref SnsNotificationPolicy
+  ComprehendDataAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join: 
+          - ''
+          - - comprehend-data-access
+            - -${self:provider.stage}-
+            - Ref: ServicePrefix
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - comprehend.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/ComprehendDataAccessRolePolicy 

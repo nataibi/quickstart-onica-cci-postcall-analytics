@@ -1,0 +1,4512 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09", 
+  "Description": "The AWS CloudFormation template for this Serverless application", 
+  "Resources": {
+    "TranscribeJobProducerLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-transcribeJobProducer", 
+        "Handler": "functions/source/transcribe/transcribeHandler.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TranscribeS3DynamoDBRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 6, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "TRANSCRIBE_OUTPUT_BUCKET": {
+              "Ref": "TranscriptionOutput"
+            }, 
+            "CUSTOM_VOCABULARY_NAME": {
+              "Ref": "CustomVocabularyName"
+            }, 
+            "TABLE_NAME": {
+              "Ref": "StatusTable"
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "TranscribeS3DynamoDBRole"
+      ]
+    }, 
+    "TranscribeJobProducerLambdaVersionuUWpj61zZb74nAOOD5EyTU7Mimyd1NBSXAfqvmJRc": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "TranscribeJobProducerLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "SplitTranscriptLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-splitTranscript", 
+        "Handler": "functions/source/analysis/splitTranscript.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TranscriptSplitterRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 120, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "SPLIT_TRANSCRIPT_OUTPUT_BUCKET": {
+              "Ref": "SplitTranscriptOutput"
+            }, 
+            "TABLE_NAME": {
+              "Ref": "StatusTable"
+            }, 
+            "AGENT_CHANNEL": {
+              "Ref": "AgentChannel"
+            }, 
+            "AGENT_LABEL": {
+              "Ref": "AgentSpeakerLabel"
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "TranscriptSplitterRole"
+      ]
+    }, 
+    "SplitTranscriptLambdaVersionjicBtPNhIW8Q153XZnDBoGL8bBy62UtlR9c8RXt0A": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "SplitTranscriptLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "AnalyseTextLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-analyseText", 
+        "Handler": "functions/source/analysis/analyseTranscript.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ComprehendFullAccessRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 120, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "TEXT_ANALYSIS_OUTPUT_BUCKET": {
+              "Ref": "TextAnalysisOutput"
+            }, 
+            "DATA_ACCESS_ROLE": {
+              "Fn::GetAtt": [
+                "TextAnalysisRole", 
+                "Arn"
+              ]
+            }, 
+            "TABLE_NAME": {
+              "Ref": "StatusTable"
+            }, 
+            "CALL_RESOLUTION_ENDPOINT_ARN": {
+              "Fn::Join": [
+                "", 
+                [
+                  "arn:aws:comprehend:region:account-id:document-classifier-endpoint/", 
+                  {
+                    "Ref": "CallResolutionClassifierName"
+                  }, 
+                  "Endpoint"
+                ]
+              ]
+            }, 
+            "CALL_MOTIVATION_ENDPOINT_ARN": {
+              "Fn::Join": [
+                "", 
+                [
+                  "arn:aws:comprehend:region:account-id:document-classifier-endpoint/", 
+                  {
+                    "Ref": "CallMotivationClassifierName"
+                  }, 
+                  "Endpoint"
+                ]
+              ]
+            }, 
+            "TOPIC_ARN": {
+              "Ref": "ThreatNotificationTopic"
+            }, 
+            "AGENT_CHANNEL": {
+              "Ref": "AgentChannel"
+            }, 
+            "AGENT_LABEL": {
+              "Ref": "AgentSpeakerLabel"
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "ComprehendFullAccessRole"
+      ]
+    }, 
+    "AnalyseTextLambdaVersionNvpHFIoAeXib8hglMWXmpqwSoTkeIhLI7xr0qCjZCQY": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "AnalyseTextLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "GetTranscriptsLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-getTranscripts", 
+        "Handler": "functions/source/api/getTranscripts.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ScanTranscriptsRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 120, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "TABLE_NAME": {
+              "Ref": "StatusTable"
+            }, 
+            "AGENT_CHANNEL": {
+              "Ref": "AgentChannel"
+            }, 
+            "AGENT_LABEL": {
+              "Ref": "AgentSpeakerLabel"
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "ScanTranscriptsRole"
+      ]
+    }, 
+    "GetTranscriptsLambdaVersionBMDOKyLmd09AeFJkkEv3jxouUy11AJuMByh1W2XZo": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetTranscriptsLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "GetAudioLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-getAudio", 
+        "Handler": "functions/source/api/getAudio.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TranscriptionAudioFilesRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 6, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "BUCKET_NAME": {
+              "Fn::Join": [
+                "", 
+                [
+                  "transcription-audio-files", 
+                  "-dev-", 
+                  {
+                    "Ref": "ServicePrefix"
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "TranscriptionAudioFilesRole"
+      ]
+    }, 
+    "GetAudioLambdaVersionv1YDCft32Ul0AmTZp58GltKjVJrRxGfgETFsRGUTU": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetAudioLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "GetSentimentLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-getSentiment", 
+        "Handler": "functions/source/api/getSentiments.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "GetSentimentsRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 6, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "BUCKET": {
+              "Fn::Join": [
+                "", 
+                [
+                  "text-analysis-output", 
+                  "-dev-", 
+                  {
+                    "Ref": "ServicePrefix"
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "GetSentimentsRole"
+      ]
+    }, 
+    "GetSentimentLambdaVersionjzGED65H96phijF85kKsVhZlRLhJ8DjWcDdIy4JfBA": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetSentimentLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "GetPresignedUrlLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-getPresignedUrl", 
+        "Handler": "functions/source/api/getPresignedUrl.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TranscriptionAudioFilesRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 6, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "BUCKET_NAME": {
+              "Fn::Join": [
+                "", 
+                [
+                  "transcription-audio-files", 
+                  "-dev-", 
+                  {
+                    "Ref": "ServicePrefix"
+                  }
+                ]
+              ]
+            }, 
+            "TOKEN_ENDPOINT": {
+              "Fn::Join": [
+                "", 
+                [
+                  "https://", 
+                  {
+                    "Ref": "CognitoDomain"
+                  }, 
+                  ".auth.region.amazoncognito.com/oauth2/userInfo"
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "TranscriptionAudioFilesRole"
+      ]
+    }, 
+    "GetPresignedUrlLambdaVersionAMpaQh8shicDTvgQ2rikiB6qtBz8hTjju5G146cNb4": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetPresignedUrlLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "UpdateStatusLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-updateStatus", 
+        "Handler": "functions/source/api/updateStatus.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "DynamoBatchWriteRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 6, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "TABLE_NAME": {
+              "Ref": "StatusTable"
+            }, 
+            "TOKEN_ENDPOINT": {
+              "Fn::Join": [
+                "", 
+                [
+                  "https://", 
+                  {
+                    "Ref": "CognitoDomain"
+                  }, 
+                  ".auth.region.amazoncognito.com/oauth2/userInfo"
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "DynamoBatchWriteRole"
+      ]
+    }, 
+    "UpdateStatusLambdaVersionnWE4mHiwfU2XyL3E1BimFtdzXpe4lkKGEYLwPKMRSa8": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "UpdateStatusLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "QuickSightFederationFunctionLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-quickSightFederationFunction", 
+        "Handler": "functions/source/api/quicksightAuth.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaBasicExecutionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 6, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1
+          }
+        }
+      }, 
+      "DependsOn": [
+        "LambdaBasicExecutionRole"
+      ]
+    }, 
+    "QuickSightFederationFunctionLambdaVersion6VHIXA1Ojng88XtFfXyxaIiv8eZ2ZVEgQ7BaEczyw": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "QuickSightFederationFunctionLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "CreateCallResolutionClassiferLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-createCallResolutionClassifer", 
+        "Handler": "functions/source/classifiers/callResolutionClassifier.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ComprehendFullAccessRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 900, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "DATA_ACCESS_ROLE": {
+              "Fn::GetAtt": [
+                "ComprehendDataAccessRole", 
+                "Arn"
+              ]
+            }, 
+            "CLASSIFIER_NAME": {
+              "Ref": "CallResolutionClassifierName"
+            }, 
+            "CALL_RESOLUTION_BUCKET": {
+              "Fn::Join": [
+                "", 
+                [
+                  "comprehend-call-resolution", 
+                  "-dev-", 
+                  {
+                    "Ref": "ServicePrefix"
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "ComprehendFullAccessRole"
+      ]
+    }, 
+    "CreateCallResolutionClassiferLambdaVersionAtVmI2H7taQVN2S5Zkqvs9I9l7SOdjbdpfL4XObbWdk": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateCallResolutionClassiferLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "CreateCallMotivationClassifierLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-createCallMotivationClassifier", 
+        "Handler": "functions/source/classifiers/createMotivationClassifier.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ComprehendFullAccessRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 900, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "DATA_ACCESS_ROLE": {
+              "Fn::GetAtt": [
+                "ComprehendDataAccessRole", 
+                "Arn"
+              ]
+            }, 
+            "CLASSIFIER_NAME": {
+              "Ref": "CallMotivationClassifierName"
+            }, 
+            "CALL_MOTIVATION_INPUT": {
+              "Fn::Join": [
+                "", 
+                [
+                  "comprehend-call-motivation", 
+                  "-dev-", 
+                  {
+                    "Ref": "ServicePrefix"
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "ComprehendFullAccessRole"
+      ]
+    }, 
+    "CreateCallMotivationClassifierLambdaVersionXlQb7SS6rGJJQmAj3NvSkZGy9maWqtkip65YhL2ikU": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateCallMotivationClassifierLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "CreateCallResolutionEndpointLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-createCallResolutionEndpoint", 
+        "Handler": "functions/source/endpoints/callResolutionEnpoint.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ComprehendFullAccessRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 120, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "DATA_ACCESS_ROLE": {
+              "Fn::GetAtt": [
+                "ComprehendDataAccessRole", 
+                "Arn"
+              ]
+            }, 
+            "CLASSIFIER_NAME": {
+              "Ref": "CallResolutionClassifierName"
+            }, 
+            "CALL_RESOLUTION_ARN": {
+              "Fn::Join": [
+                "", 
+                [
+                  "arn:aws:comprehend:region:account-id:document-classifier/", 
+                  {
+                    "Ref": "CallResolutionClassifierName"
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "ComprehendFullAccessRole"
+      ]
+    }, 
+    "CreateCallResolutionEndpointLambdaVersionUVQicfWZ5yuJkgg7QGF2UQANry9YpIHMcHcWW2MudA": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateCallResolutionEndpointLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "CreateCallMotivationEndpointLambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-createCallMotivationEndpoint", 
+        "Handler": "functions/source/endpoints/createMotivationEndpoint.handler", 
+        "MemorySize": 1024, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ComprehendFullAccessRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 120, 
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": 1, 
+            "DATA_ACCESS_ROLE": {
+              "Fn::GetAtt": [
+                "ComprehendDataAccessRole", 
+                "Arn"
+              ]
+            }, 
+            "CLASSIFIER_NAME": {
+              "Ref": "CallMotivationClassifierName"
+            }, 
+            "CALL_MOTIVATION_ARN": {
+              "Fn::Join": [
+                "", 
+                [
+                  "arn:aws:comprehend:region:account-id:document-classifier/", 
+                  {
+                    "Ref": "CallMotivationClassifierName"
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      }, 
+      "DependsOn": [
+        "ComprehendFullAccessRole"
+      ]
+    }, 
+    "CreateCallMotivationEndpointLambdaVersioniiv9kCq4Cj5drMSwnXEOyVUDDt6Zz19Vxa5Dw5FpQ": {
+      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateCallMotivationEndpointLambdaFunction"
+        }, 
+        "CodeSha256": "pZ/FcezZq8sfw/M1s4n/UPSbgTJUPCq9BXuH53Ah7go="
+      }
+    }, 
+    "CreateCallResolutionEndpointEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "ScheduleExpression": "rate(3 minutes)", 
+        "State": "ENABLED", 
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "CreateCallResolutionEndpointLambdaFunction", 
+                "Arn"
+              ]
+            }, 
+            "Id": "createCallResolutionEndpointSchedule"
+          }
+        ]
+      }
+    }, 
+    "CreateCallResolutionEndpointLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CreateCallResolutionEndpointLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "events.amazonaws.com", 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "CreateCallResolutionEndpointEventsRuleSchedule1", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "CreateCallMotivationEndpointEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "ScheduleExpression": "rate(3 minutes)", 
+        "State": "ENABLED", 
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "CreateCallMotivationEndpointLambdaFunction", 
+                "Arn"
+              ]
+            }, 
+            "Id": "createCallMotivationEndpointSchedule"
+          }
+        ]
+      }
+    }, 
+    "CreateCallMotivationEndpointLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CreateCallMotivationEndpointLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "events.amazonaws.com", 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "CreateCallMotivationEndpointEventsRuleSchedule1", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "TranscribeJobProducerCustomS31": {
+      "Type": "Custom::S3", 
+      "Version": 1, 
+      "DependsOn": [
+        "TranscribeJobProducerLambdaFunction", 
+        "CustomDashresourceDashexistingDashs3LambdaFunction"
+      ], 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomDashresourceDashexistingDashs3LambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "FunctionName": "aws-icc-dev-transcribeJobProducer", 
+        "BucketName": {
+          "Ref": "TranscriptionAudioFiles"
+        }, 
+        "BucketConfigs": [
+          {
+            "Event": "s3:ObjectCreated:*", 
+            "Rules": []
+          }
+        ]
+      }
+    }, 
+    "SplitTranscriptCustomS31": {
+      "Type": "Custom::S3", 
+      "Version": 1, 
+      "DependsOn": [
+        "SplitTranscriptLambdaFunction", 
+        "CustomDashresourceDashexistingDashs3LambdaFunction", 
+        "TranscribeJobProducerCustomS31"
+      ], 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomDashresourceDashexistingDashs3LambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "FunctionName": "aws-icc-dev-splitTranscript", 
+        "BucketName": {
+          "Ref": "TranscriptionOutput"
+        }, 
+        "BucketConfigs": [
+          {
+            "Event": "s3:ObjectCreated:*", 
+            "Rules": []
+          }
+        ]
+      }
+    }, 
+    "AnalyseTextCustomS31": {
+      "Type": "Custom::S3", 
+      "Version": 1, 
+      "DependsOn": [
+        "AnalyseTextLambdaFunction", 
+        "CustomDashresourceDashexistingDashs3LambdaFunction", 
+        "SplitTranscriptCustomS31"
+      ], 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomDashresourceDashexistingDashs3LambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "FunctionName": "aws-icc-dev-analyseText", 
+        "BucketName": {
+          "Ref": "SplitTranscriptOutput"
+        }, 
+        "BucketConfigs": [
+          {
+            "Event": "s3:ObjectCreated:*", 
+            "Rules": []
+          }
+        ]
+      }
+    }, 
+    "CreateCallResolutionClassiferCustomS31": {
+      "Type": "Custom::S3", 
+      "Version": 1, 
+      "DependsOn": [
+        "CreateCallResolutionClassiferLambdaFunction", 
+        "CustomDashresourceDashexistingDashs3LambdaFunction", 
+        "AnalyseTextCustomS31"
+      ], 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomDashresourceDashexistingDashs3LambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "FunctionName": "aws-icc-dev-createCallResolutionClassifer", 
+        "BucketName": {
+          "Ref": "ComprehendCallResolutionBucket"
+        }, 
+        "BucketConfigs": [
+          {
+            "Event": "s3:ObjectCreated:*", 
+            "Rules": []
+          }
+        ]
+      }
+    }, 
+    "CreateCallMotivationClassifierCustomS31": {
+      "Type": "Custom::S3", 
+      "Version": 1, 
+      "DependsOn": [
+        "CreateCallMotivationClassifierLambdaFunction", 
+        "CustomDashresourceDashexistingDashs3LambdaFunction", 
+        "CreateCallResolutionClassiferCustomS31"
+      ], 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomDashresourceDashexistingDashs3LambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "FunctionName": "aws-icc-dev-createCallMotivationClassifier", 
+        "BucketName": {
+          "Ref": "ComprehendCallMotivationBucket"
+        }, 
+        "BucketConfigs": [
+          {
+            "Event": "s3:ObjectCreated:*", 
+            "Rules": []
+          }
+        ]
+      }
+    }, 
+    "IamRoleCustomResourcesLambdaExecution": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }, 
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-", 
+                [
+                  "dev", 
+                  "aws-icc", 
+                  "custom-resources-lambda"
+                ]
+              ]
+            }, 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "s3", 
+                        "", 
+                        "", 
+                        {
+                          "Ref": "TranscriptionAudioFiles"
+                        }
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "s3:PutBucketNotification", 
+                    "s3:GetBucketNotification"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "lambda", 
+                        {
+                          "Ref": "AWS::Region"
+                        }, 
+                        {
+                          "Ref": "AWS::AccountId"
+                        }, 
+                        "function", 
+                        "aws-icc-dev-transcribeJobProducer"
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "lambda:AddPermission", 
+                    "lambda:RemovePermission"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "s3", 
+                        "", 
+                        "", 
+                        {
+                          "Ref": "TranscriptionOutput"
+                        }
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "s3:PutBucketNotification", 
+                    "s3:GetBucketNotification"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "lambda", 
+                        {
+                          "Ref": "AWS::Region"
+                        }, 
+                        {
+                          "Ref": "AWS::AccountId"
+                        }, 
+                        "function", 
+                        "aws-icc-dev-splitTranscript"
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "lambda:AddPermission", 
+                    "lambda:RemovePermission"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "s3", 
+                        "", 
+                        "", 
+                        {
+                          "Ref": "SplitTranscriptOutput"
+                        }
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "s3:PutBucketNotification", 
+                    "s3:GetBucketNotification"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "lambda", 
+                        {
+                          "Ref": "AWS::Region"
+                        }, 
+                        {
+                          "Ref": "AWS::AccountId"
+                        }, 
+                        "function", 
+                        "aws-icc-dev-analyseText"
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "lambda:AddPermission", 
+                    "lambda:RemovePermission"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "s3", 
+                        "", 
+                        "", 
+                        {
+                          "Ref": "ComprehendCallResolutionBucket"
+                        }
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "s3:PutBucketNotification", 
+                    "s3:GetBucketNotification"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "lambda", 
+                        {
+                          "Ref": "AWS::Region"
+                        }, 
+                        {
+                          "Ref": "AWS::AccountId"
+                        }, 
+                        "function", 
+                        "aws-icc-dev-createCallResolutionClassifer"
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "lambda:AddPermission", 
+                    "lambda:RemovePermission"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "s3", 
+                        "", 
+                        "", 
+                        {
+                          "Ref": "ComprehendCallMotivationBucket"
+                        }
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "s3:PutBucketNotification", 
+                    "s3:GetBucketNotification"
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Resource": {
+                    "Fn::Join": [
+                      ":", 
+                      [
+                        "arn", 
+                        {
+                          "Ref": "AWS::Partition"
+                        }, 
+                        "lambda", 
+                        {
+                          "Ref": "AWS::Region"
+                        }, 
+                        {
+                          "Ref": "AWS::AccountId"
+                        }, 
+                        "function", 
+                        "aws-icc-dev-createCallMotivationClassifier"
+                      ]
+                    ]
+                  }, 
+                  "Action": [
+                    "lambda:AddPermission", 
+                    "lambda:RemovePermission"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "CustomDashresourceDashexistingDashs3LambdaFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          }, 
+          "S3Key": {
+            "Fn::Sub": "${QSS3KeyPrefix}packages/custom-resources.zip"
+          }
+        }, 
+        "FunctionName": "aws-icc-dev-custom-resource-existing-s3", 
+        "Handler": "s3/handler.handler", 
+        "MemorySize": 1024, 
+        "Runtime": "nodejs12.x", 
+        "Timeout": 180, 
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleCustomResourcesLambdaExecution", 
+            "Arn"
+          ]
+        }
+      }, 
+      "DependsOn": [
+        "IamRoleCustomResourcesLambdaExecution"
+      ]
+    }, 
+    "ApiGatewayResourceApi": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "Api", 
+            "RootResourceId"
+          ]
+        }, 
+        "PathPart": "api", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayResourceApiTranscripts": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceApi"
+        }, 
+        "PathPart": "transcripts", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayResourceApiAudio": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceApi"
+        }, 
+        "PathPart": "audio", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayResourceApiSentiment": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceApi"
+        }, 
+        "PathPart": "sentiment", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayResourceApiPresigned": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceApi"
+        }, 
+        "PathPart": "presigned", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayResourceApiStatus": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceApi"
+        }, 
+        "PathPart": "status", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayResourceAuth": {
+      "Type": "AWS::ApiGateway::Resource", 
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "Api", 
+            "RootResourceId"
+          ]
+        }, 
+        "PathPart": "auth", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodApiTranscriptsOptions": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "AuthorizationType": "NONE", 
+        "HttpMethod": "OPTIONS", 
+        "MethodResponses": [
+          {
+            "StatusCode": "200", 
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true, 
+              "method.response.header.Access-Control-Allow-Headers": true, 
+              "method.response.header.Access-Control-Allow-Methods": true
+            }, 
+            "ResponseModels": {}
+          }
+        ], 
+        "RequestParameters": {}, 
+        "Integration": {
+          "Type": "MOCK", 
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          }, 
+          "ContentHandling": "CONVERT_TO_TEXT", 
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200", 
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'", 
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+              }, 
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiTranscripts"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodApiAudioOptions": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "AuthorizationType": "NONE", 
+        "HttpMethod": "OPTIONS", 
+        "MethodResponses": [
+          {
+            "StatusCode": "200", 
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true, 
+              "method.response.header.Access-Control-Allow-Headers": true, 
+              "method.response.header.Access-Control-Allow-Methods": true
+            }, 
+            "ResponseModels": {}
+          }
+        ], 
+        "RequestParameters": {}, 
+        "Integration": {
+          "Type": "MOCK", 
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          }, 
+          "ContentHandling": "CONVERT_TO_TEXT", 
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200", 
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'", 
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+              }, 
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiAudio"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodApiSentimentOptions": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "AuthorizationType": "NONE", 
+        "HttpMethod": "OPTIONS", 
+        "MethodResponses": [
+          {
+            "StatusCode": "200", 
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true, 
+              "method.response.header.Access-Control-Allow-Headers": true, 
+              "method.response.header.Access-Control-Allow-Methods": true
+            }, 
+            "ResponseModels": {}
+          }
+        ], 
+        "RequestParameters": {}, 
+        "Integration": {
+          "Type": "MOCK", 
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          }, 
+          "ContentHandling": "CONVERT_TO_TEXT", 
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200", 
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'", 
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+              }, 
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiSentiment"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodApiPresignedOptions": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "AuthorizationType": "NONE", 
+        "HttpMethod": "OPTIONS", 
+        "MethodResponses": [
+          {
+            "StatusCode": "200", 
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true, 
+              "method.response.header.Access-Control-Allow-Headers": true, 
+              "method.response.header.Access-Control-Allow-Methods": true
+            }, 
+            "ResponseModels": {}
+          }
+        ], 
+        "RequestParameters": {}, 
+        "Integration": {
+          "Type": "MOCK", 
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          }, 
+          "ContentHandling": "CONVERT_TO_TEXT", 
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200", 
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'", 
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              }, 
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiPresigned"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodApiStatusOptions": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "AuthorizationType": "NONE", 
+        "HttpMethod": "OPTIONS", 
+        "MethodResponses": [
+          {
+            "StatusCode": "200", 
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true, 
+              "method.response.header.Access-Control-Allow-Headers": true, 
+              "method.response.header.Access-Control-Allow-Methods": true
+            }, 
+            "ResponseModels": {}
+          }
+        ], 
+        "RequestParameters": {}, 
+        "Integration": {
+          "Type": "MOCK", 
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          }, 
+          "ContentHandling": "CONVERT_TO_TEXT", 
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200", 
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'", 
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              }, 
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiStatus"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodAuthOptions": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "AuthorizationType": "NONE", 
+        "HttpMethod": "OPTIONS", 
+        "MethodResponses": [
+          {
+            "StatusCode": "200", 
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true, 
+              "method.response.header.Access-Control-Allow-Headers": true, 
+              "method.response.header.Access-Control-Allow-Methods": true
+            }, 
+            "ResponseModels": {}
+          }
+        ], 
+        "RequestParameters": {}, 
+        "Integration": {
+          "Type": "MOCK", 
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          }, 
+          "ContentHandling": "CONVERT_TO_TEXT", 
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200", 
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'", 
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              }, 
+              "ResponseTemplates": {
+                "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+              }
+            }
+          ]
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceAuth"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "ApiGatewayMethodApiTranscriptsGet": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "HttpMethod": "GET", 
+        "RequestParameters": {
+          "method.request.header.authorization": false
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiTranscripts"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "ApiKeyRequired": false, 
+        "AuthorizationType": "COGNITO_USER_POOLS", 
+        "AuthorizerId": {
+          "Ref": "ApiGatewayAuthorizer"
+        }, 
+        "AuthorizationScopes": [
+          "email", 
+          "openid"
+        ], 
+        "Integration": {
+          "IntegrationHttpMethod": "POST", 
+          "Type": "AWS_PROXY", 
+          "Uri": {
+            "Fn::Join": [
+              "", 
+              [
+                "arn:", 
+                {
+                  "Ref": "AWS::Partition"
+                }, 
+                ":apigateway:", 
+                {
+                  "Ref": "AWS::Region"
+                }, 
+                ":lambda:path/2015-03-31/functions/", 
+                {
+                  "Fn::GetAtt": [
+                    "GetTranscriptsLambdaFunction", 
+                    "Arn"
+                  ]
+                }, 
+                "/invocations"
+              ]
+            ]
+          }
+        }, 
+        "MethodResponses": []
+      }
+    }, 
+    "ApiGatewayMethodApiAudioGet": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "HttpMethod": "GET", 
+        "RequestParameters": {
+          "method.request.header.authorization": false
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiAudio"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "ApiKeyRequired": false, 
+        "AuthorizationType": "COGNITO_USER_POOLS", 
+        "AuthorizerId": {
+          "Ref": "ApiGatewayAuthorizer"
+        }, 
+        "AuthorizationScopes": [
+          "email", 
+          "openid"
+        ], 
+        "Integration": {
+          "IntegrationHttpMethod": "POST", 
+          "Type": "AWS_PROXY", 
+          "Uri": {
+            "Fn::Join": [
+              "", 
+              [
+                "arn:", 
+                {
+                  "Ref": "AWS::Partition"
+                }, 
+                ":apigateway:", 
+                {
+                  "Ref": "AWS::Region"
+                }, 
+                ":lambda:path/2015-03-31/functions/", 
+                {
+                  "Fn::GetAtt": [
+                    "GetAudioLambdaFunction", 
+                    "Arn"
+                  ]
+                }, 
+                "/invocations"
+              ]
+            ]
+          }
+        }, 
+        "MethodResponses": []
+      }
+    }, 
+    "ApiGatewayMethodApiSentimentGet": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "HttpMethod": "GET", 
+        "RequestParameters": {
+          "method.request.header.authorization": false
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiSentiment"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "ApiKeyRequired": false, 
+        "AuthorizationType": "COGNITO_USER_POOLS", 
+        "AuthorizerId": {
+          "Ref": "ApiGatewayAuthorizer"
+        }, 
+        "AuthorizationScopes": [
+          "email", 
+          "openid"
+        ], 
+        "Integration": {
+          "IntegrationHttpMethod": "POST", 
+          "Type": "AWS_PROXY", 
+          "Uri": {
+            "Fn::Join": [
+              "", 
+              [
+                "arn:", 
+                {
+                  "Ref": "AWS::Partition"
+                }, 
+                ":apigateway:", 
+                {
+                  "Ref": "AWS::Region"
+                }, 
+                ":lambda:path/2015-03-31/functions/", 
+                {
+                  "Fn::GetAtt": [
+                    "GetSentimentLambdaFunction", 
+                    "Arn"
+                  ]
+                }, 
+                "/invocations"
+              ]
+            ]
+          }
+        }, 
+        "MethodResponses": []
+      }
+    }, 
+    "ApiGatewayMethodApiPresignedPost": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "HttpMethod": "POST", 
+        "RequestParameters": {
+          "method.request.header.authorization": false
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiPresigned"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "ApiKeyRequired": false, 
+        "AuthorizationType": "COGNITO_USER_POOLS", 
+        "AuthorizerId": {
+          "Ref": "ApiGatewayAuthorizer"
+        }, 
+        "AuthorizationScopes": [
+          "email", 
+          "openid"
+        ], 
+        "Integration": {
+          "IntegrationHttpMethod": "POST", 
+          "Type": "AWS_PROXY", 
+          "Uri": {
+            "Fn::Join": [
+              "", 
+              [
+                "arn:", 
+                {
+                  "Ref": "AWS::Partition"
+                }, 
+                ":apigateway:", 
+                {
+                  "Ref": "AWS::Region"
+                }, 
+                ":lambda:path/2015-03-31/functions/", 
+                {
+                  "Fn::GetAtt": [
+                    "GetPresignedUrlLambdaFunction", 
+                    "Arn"
+                  ]
+                }, 
+                "/invocations"
+              ]
+            ]
+          }
+        }, 
+        "MethodResponses": []
+      }
+    }, 
+    "ApiGatewayMethodApiStatusPost": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "HttpMethod": "POST", 
+        "RequestParameters": {
+          "method.request.header.authorization": false
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceApiStatus"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "ApiKeyRequired": false, 
+        "AuthorizationType": "COGNITO_USER_POOLS", 
+        "AuthorizerId": {
+          "Ref": "ApiGatewayAuthorizer"
+        }, 
+        "AuthorizationScopes": [
+          "email", 
+          "openid"
+        ], 
+        "Integration": {
+          "IntegrationHttpMethod": "POST", 
+          "Type": "AWS_PROXY", 
+          "Uri": {
+            "Fn::Join": [
+              "", 
+              [
+                "arn:", 
+                {
+                  "Ref": "AWS::Partition"
+                }, 
+                ":apigateway:", 
+                {
+                  "Ref": "AWS::Region"
+                }, 
+                ":lambda:path/2015-03-31/functions/", 
+                {
+                  "Fn::GetAtt": [
+                    "UpdateStatusLambdaFunction", 
+                    "Arn"
+                  ]
+                }, 
+                "/invocations"
+              ]
+            ]
+          }
+        }, 
+        "MethodResponses": []
+      }
+    }, 
+    "ApiGatewayMethodAuthPost": {
+      "Type": "AWS::ApiGateway::Method", 
+      "Properties": {
+        "HttpMethod": "POST", 
+        "RequestParameters": {
+          "method.request.header.authorization": false
+        }, 
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceAuth"
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "ApiKeyRequired": false, 
+        "AuthorizationType": "COGNITO_USER_POOLS", 
+        "AuthorizerId": {
+          "Ref": "ApiGatewayAuthorizer"
+        }, 
+        "AuthorizationScopes": [
+          "email", 
+          "openid"
+        ], 
+        "Integration": {
+          "IntegrationHttpMethod": "POST", 
+          "Type": "AWS_PROXY", 
+          "Uri": {
+            "Fn::Join": [
+              "", 
+              [
+                "arn:", 
+                {
+                  "Ref": "AWS::Partition"
+                }, 
+                ":apigateway:", 
+                {
+                  "Ref": "AWS::Region"
+                }, 
+                ":lambda:path/2015-03-31/functions/", 
+                {
+                  "Fn::GetAtt": [
+                    "QuickSightFederationFunctionLambdaFunction", 
+                    "Arn"
+                  ]
+                }, 
+                "/invocations"
+              ]
+            ]
+          }
+        }, 
+        "MethodResponses": []
+      }
+    }, 
+    "ApiGatewayDeployment1596054220864": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "StageName": "dev"
+      }, 
+      "DependsOn": [
+        "ApiGatewayMethodApiTranscriptsOptions", 
+        "ApiGatewayMethodApiAudioOptions", 
+        "ApiGatewayMethodApiSentimentOptions", 
+        "ApiGatewayMethodApiPresignedOptions", 
+        "ApiGatewayMethodApiStatusOptions", 
+        "ApiGatewayMethodAuthOptions", 
+        "ApiGatewayMethodApiTranscriptsGet", 
+        "ApiGatewayMethodApiAudioGet", 
+        "ApiGatewayMethodApiSentimentGet", 
+        "ApiGatewayMethodApiPresignedPost", 
+        "ApiGatewayMethodApiStatusPost", 
+        "ApiGatewayMethodAuthPost"
+      ]
+    }, 
+    "GetTranscriptsLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetTranscriptsLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "SourceArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:", 
+              {
+                "Ref": "AWS::Partition"
+              }, 
+              ":execute-api:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":", 
+              {
+                "Ref": "Api"
+              }, 
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }, 
+    "GetAudioLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetAudioLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "SourceArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:", 
+              {
+                "Ref": "AWS::Partition"
+              }, 
+              ":execute-api:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":", 
+              {
+                "Ref": "Api"
+              }, 
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }, 
+    "GetSentimentLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetSentimentLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "SourceArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:", 
+              {
+                "Ref": "AWS::Partition"
+              }, 
+              ":execute-api:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":", 
+              {
+                "Ref": "Api"
+              }, 
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }, 
+    "GetPresignedUrlLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetPresignedUrlLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "SourceArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:", 
+              {
+                "Ref": "AWS::Partition"
+              }, 
+              ":execute-api:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":", 
+              {
+                "Ref": "Api"
+              }, 
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }, 
+    "UpdateStatusLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "UpdateStatusLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "SourceArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:", 
+              {
+                "Ref": "AWS::Partition"
+              }, 
+              ":execute-api:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":", 
+              {
+                "Ref": "Api"
+              }, 
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }, 
+    "QuickSightFederationFunctionLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "QuickSightFederationFunctionLambdaFunction", 
+            "Arn"
+          ]
+        }, 
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "SourceArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:", 
+              {
+                "Ref": "AWS::Partition"
+              }, 
+              ":execute-api:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":", 
+              {
+                "Ref": "Api"
+              }, 
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }, 
+    "LambdaBasicExecutionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "basic-execution", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    }, 
+    "TranscribeS3DynamoDBRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "transcribe-s3-dynamo-full-access", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws:iam::aws:policy/AmazonTranscribeFullAccess", 
+          {
+            "Ref": "TranscriptionAudioFilesPolicy"
+          }
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "UpdateDynamoDBAndTranscribeOutputPolicy", 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Effect": "Allow", 
+                  "Action": [
+                    "dynamodb:Update*"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "StatusTable", 
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Action": [
+                    "s3:Put*", 
+                    "s3:ListBucket", 
+                    "s3:Get*"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "", 
+                        [
+                          "arn:aws:s3:::", 
+                          "transcription-output-dev-", 
+                          {
+                            "Ref": "ServicePrefix"
+                          }
+                        ]
+                      ]
+                    }, 
+                    {
+                      "Fn::Join": [
+                        "", 
+                        [
+                          "arn:aws:s3:::", 
+                          "transcription-output-dev-", 
+                          {
+                            "Ref": "ServicePrefix"
+                          }, 
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "DynamoBatchWriteRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "dynamodb-batch-write-role", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "ScanDynamoDBPolicy", 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Effect": "Allow", 
+                  "Action": [
+                    "dynamodb:batchWrite"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "StatusTable", 
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }, 
+                {
+                  "Effect": "Allow", 
+                  "Action": [
+                    "dynamodb:BatchWriteItem"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "StatusTable", 
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "S3ReadOnlyAccessRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "s3-readonly-access", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        ]
+      }
+    }, 
+    "TranscriptionAudioFilesRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "transcription-audio-files", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          {
+            "Ref": "TranscriptionAudioFilesPolicy"
+          }
+        ]
+      }
+    }, 
+    "ScanTranscriptsRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "scan-transcripts", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "ScanDynamoDBPolicy", 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Effect": "Allow", 
+                  "Action": [
+                    "dynamodb:Scan"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "StatusTable", 
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "TranscriptSplitterRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "split-transcript-role", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaExecute", 
+          "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ]
+      }
+    }, 
+    "GetSentimentsRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "get-sentiments-role", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaExecute", 
+          {
+            "Ref": "TextAnalysisPolicy"
+          }
+        ]
+      }
+    }, 
+    "TextAnalysisRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "text-analysis-role", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "comprehend.amazonaws.com"
+                ]
+              }, 
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          {
+            "Ref": "TextAnalysisPolicy"
+          }
+        ]
+      }
+    }, 
+    "TextAnalysisResultCrawlerRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "glue.amazonaws.com"
+                ]
+              }, 
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }, 
+        "Path": "/", 
+        "Policies": [
+          {
+            "PolicyName": "TextAnalysisResultCrawlerRolePolicy", 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Effect": "Allow", 
+                  "Action": "*", 
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "ComprehendFullAccessRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "comprehend-full-access-role", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          {
+            "Ref": "ComprehendFullAccessPolicy"
+          }, 
+          {
+            "Ref": "SnsNotificationPolicy"
+          }
+        ]
+      }
+    }, 
+    "ComprehendDataAccessRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              "comprehend-data-access", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "comprehend.amazonaws.com"
+                ]
+              }, 
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/ComprehendDataAccessRolePolicy"
+        ]
+      }
+    }, 
+    "ApiGatewayAuthorizer": {
+      "Type": "AWS::ApiGateway::Authorizer", 
+      "DependsOn": [
+        "Api"
+      ], 
+      "Properties": {
+        "AuthorizerResultTtlInSeconds": 300, 
+        "IdentitySource": "method.request.header.Authorization", 
+        "Name": {
+          "Fn::Join": [
+            "", 
+            [
+              "cognito-authorizer", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "RestApiId": {
+          "Ref": "Api"
+        }, 
+        "Type": "COGNITO_USER_POOLS", 
+        "ProviderARNs": [
+          {
+            "Fn::GetAtt": [
+              "UserPool", 
+              "Arn"
+            ]
+          }
+        ]
+      }
+    }, 
+    "CognitoAuthUI": {
+      "Type": "AWS::Cognito::UserPoolUICustomizationAttachment", 
+      "Properties": {
+        "ClientId": {
+          "Ref": "UserPoolClient"
+        }, 
+        "UserPoolId": {
+          "Ref": "UserPool"
+        }
+      }
+    }, 
+    "CognitoDomain": {
+      "Type": "AWS::Cognito::UserPoolDomain", 
+      "Properties": {
+        "Domain": {
+          "Ref": "UserPoolDomainName"
+        }, 
+        "UserPoolId": {
+          "Ref": "UserPool"
+        }
+      }
+    }, 
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool", 
+      "Properties": {
+        "UserPoolName": {
+          "Fn::Join": [
+            "", 
+            [
+              {
+                "Ref": "UserPoolName"
+              }, 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "UsernameAttributes": [
+          "email"
+        ], 
+        "AutoVerifiedAttributes": [
+          "email"
+        ], 
+        "Schema": [
+          {
+            "Name": "userId", 
+            "AttributeDataType": "String", 
+            "Mutable": true
+          }
+        ]
+      }
+    }, 
+    "UserPoolClient": {
+      "Type": "AWS::Cognito::UserPoolClient", 
+      "Properties": {
+        "UserPoolId": {
+          "Ref": "UserPool"
+        }, 
+        "GenerateSecret": false, 
+        "RefreshTokenValidity": 30, 
+        "ReadAttributes": [
+          "family_name", 
+          "given_name", 
+          "email"
+        ], 
+        "WriteAttributes": [
+          "family_name", 
+          "given_name", 
+          "email"
+        ], 
+        "AllowedOAuthFlows": [
+          "code"
+        ], 
+        "SupportedIdentityProviders": [
+          "COGNITO"
+        ], 
+        "AllowedOAuthFlowsUserPoolClient": true, 
+        "AllowedOAuthScopes": [
+          "openid", 
+          "profile", 
+          "email"
+        ], 
+        "CallbackURLs": [
+          {
+            "Fn::Join": [
+              "", 
+              [
+                "https://", 
+                {
+                  "Fn::GetAtt": [
+                    "CloudFrontDistribution", 
+                    "DomainName"
+                  ]
+                }, 
+                "/login"
+              ]
+            ]
+          }
+        ], 
+        "LogoutURLs": [
+          {
+            "Fn::Join": [
+              "", 
+              [
+                "https://", 
+                {
+                  "Fn::GetAtt": [
+                    "CloudFrontDistribution", 
+                    "DomainName"
+                  ]
+                }, 
+                "/login"
+              ]
+            ]
+          }
+        ]
+      }
+    }, 
+    "IdentityPool": {
+      "Type": "AWS::Cognito::IdentityPool", 
+      "Properties": {
+        "IdentityPoolName": {
+          "Fn::Join": [
+            "", 
+            [
+              {
+                "Ref": "IdentityPoolName"
+              }, 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AllowUnauthenticatedIdentities": true, 
+        "CognitoIdentityProviders": [
+          {
+            "ClientId": {
+              "Ref": "UserPoolClient"
+            }, 
+            "ProviderName": {
+              "Fn::GetAtt": [
+                "UserPool", 
+                "ProviderName"
+              ]
+            }, 
+            "ServerSideTokenCheck": true
+          }
+        ]
+      }
+    }, 
+    "QuickSightUserRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "", 
+            [
+              {
+                "Ref": "QuickSightUserRoleName"
+              }, 
+              "_dev_", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              }, 
+              "Action": [
+                "sts:AssumeRoleWithWebIdentity"
+              ], 
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "IdentityPool"
+                  }
+                }, 
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }, 
+        "Policies": [
+          {
+            "PolicyName": "QuickSightUserRolePolicy", 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Effect": "Allow", 
+                  "Action": [
+                    "quicksight:Create*", 
+                    "quicksight:Describe*", 
+                    "quicksight:Delete*", 
+                    "quicksight:TagResource", 
+                    "quicksight:PassDataSource"
+                  ], 
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "IdentityPoolRoleAttachment": {
+      "Type": "AWS::Cognito::IdentityPoolRoleAttachment", 
+      "Properties": {
+        "IdentityPoolId": {
+          "Ref": "IdentityPool"
+        }, 
+        "Roles": {
+          "authenticated": {
+            "Fn::GetAtt": [
+              "QuickSightUserRole", 
+              "Arn"
+            ]
+          }
+        }
+      }
+    }, 
+    "ComprehendCallResolutionBucket": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "comprehend-call-resolution", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "ComprehendCallMotivationBucket": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "comprehend-call-motivation", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "TranscriptionOutput": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "transcription-output", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "TranscriptionAudioFiles": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "transcription-audio-files", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": [
+                "*"
+              ], 
+              "AllowedMethods": [
+                "PUT"
+              ], 
+              "AllowedOrigins": [
+                "*"
+              ]
+            }
+          ]
+        }
+      }
+    }, 
+    "StatusTable": {
+      "Type": "AWS::DynamoDB::Table", 
+      "Properties": {
+        "TableName": {
+          "Fn::Join": [
+            "", 
+            [
+              "jobStatus", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "jobId", 
+            "AttributeType": "S"
+          }, 
+          {
+            "AttributeName": "audioURI", 
+            "AttributeType": "S"
+          }, 
+          {
+            "AttributeName": "transcriptURI", 
+            "AttributeType": "S"
+          }, 
+          {
+            "AttributeName": "lastModified", 
+            "AttributeType": "S"
+          }, 
+          {
+            "AttributeName": "transcriptionJobName", 
+            "AttributeType": "S"
+          }
+        ], 
+        "KeySchema": [
+          {
+            "AttributeName": "jobId", 
+            "KeyType": "HASH"
+          }, 
+          {
+            "AttributeName": "lastModified", 
+            "KeyType": "RANGE"
+          }
+        ], 
+        "LocalSecondaryIndexes": [
+          {
+            "IndexName": "audioLSI", 
+            "KeySchema": [
+              {
+                "AttributeName": "jobId", 
+                "KeyType": "HASH"
+              }, 
+              {
+                "AttributeName": "audioURI", 
+                "KeyType": "RANGE"
+              }
+            ], 
+            "Projection": {
+              "ProjectionType": "ALL"
+            }
+          }, 
+          {
+            "IndexName": "transcriptLSI", 
+            "KeySchema": [
+              {
+                "AttributeName": "jobId", 
+                "KeyType": "HASH"
+              }, 
+              {
+                "AttributeName": "transcriptURI", 
+                "KeyType": "RANGE"
+              }
+            ], 
+            "Projection": {
+              "ProjectionType": "ALL"
+            }
+          }
+        ], 
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "jobStatusGSI", 
+            "KeySchema": [
+              {
+                "AttributeName": "transcriptionJobName", 
+                "KeyType": "HASH"
+              }
+            ], 
+            "Projection": {
+              "ProjectionType": "ALL"
+            }, 
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 1, 
+              "WriteCapacityUnits": 1
+            }
+          }
+        ], 
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1, 
+          "WriteCapacityUnits": 1
+        }
+      }
+    }, 
+    "SplitTranscriptOutput": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "split-transcript-output", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "TextAnalysisOutput": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "text-analysis-output", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "TranscriptionAudioFilesPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy", 
+      "Properties": {
+        "ManagedPolicyName": {
+          "Fn::Join": [
+            "", 
+            [
+              "get-presignedurl-policy", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "PolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "s3:Put*", 
+                "s3:ListBucket", 
+                "s3:Get*"
+              ], 
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "", 
+                    [
+                      "arn:aws:s3:::", 
+                      "transcription-audio-files-dev-", 
+                      {
+                        "Ref": "ServicePrefix"
+                      }
+                    ]
+                  ]
+                }, 
+                {
+                  "Fn::Join": [
+                    "", 
+                    [
+                      "arn:aws:s3:::", 
+                      "transcription-audio-files-dev-", 
+                      {
+                        "Ref": "ServicePrefix"
+                      }, 
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }, 
+    "TextAnalysisPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy", 
+      "Properties": {
+        "ManagedPolicyName": {
+          "Fn::Join": [
+            "", 
+            [
+              "text-analysis-policy", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "PolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "s3:Put*", 
+                "s3:ListBucket", 
+                "s3:Get*"
+              ], 
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "", 
+                    [
+                      "arn:aws:s3:::", 
+                      "text-analysis-output-dev-", 
+                      {
+                        "Ref": "ServicePrefix"
+                      }
+                    ]
+                  ]
+                }, 
+                {
+                  "Fn::Join": [
+                    "", 
+                    [
+                      "arn:aws:s3:::", 
+                      "text-analysis-output-dev-", 
+                      {
+                        "Ref": "ServicePrefix"
+                      }, 
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }, 
+    "TextAnalysisDatabase": {
+      "Type": "AWS::Glue::Database", 
+      "Properties": {
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        }, 
+        "DatabaseInput": {
+          "Name": {
+            "Fn::Join": [
+              "", 
+              [
+                "text_analysis_database", 
+                "-dev-", 
+                {
+                  "Ref": "ServicePrefix"
+                }
+              ]
+            ]
+          }, 
+          "Description": "AWS Glue container to hold metadata tables for the text analysis crawler"
+        }
+      }
+    }, 
+    "TextAnalysisMetadataCrawler": {
+      "Type": "AWS::Glue::Crawler", 
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "", 
+            [
+              "text-analysis-metadata-crawler", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TextAnalysisResultCrawlerRole", 
+            "Arn"
+          ]
+        }, 
+        "Description": "AWS Glue crawler to crawl text analysis results", 
+        "Schedule": {
+          "ScheduleExpression": "cron(0/59 * * * ? *)"
+        }, 
+        "DatabaseName": {
+          "Ref": "TextAnalysisDatabase"
+        }, 
+        "Targets": {
+          "S3Targets": [
+            {
+              "Path": {
+                "Ref": "TextAnalysisOutput"
+              }
+            }
+          ]
+        }, 
+        "SchemaChangePolicy": {
+          "UpdateBehavior": "UPDATE_IN_DATABASE", 
+          "DeleteBehavior": "LOG"
+        }, 
+        "Configuration": "{\"Version\":1.0,\"CrawlerOutput\":{\"Partitions\":{\"AddOrUpdateBehavior\":\"InheritFromTable\"},\"Tables\":{\"AddOrUpdateBehavior\":\"MergeNewColumns\"}}}"
+      }
+    }, 
+    "TextAnalysisAthena": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "", 
+            [
+              "text-analysis-athena-results", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "FetchTurnByTurnSentimentsNamedQuery": {
+      "Type": "AWS::Athena::NamedQuery", 
+      "Properties": {
+        "Database": {
+          "Ref": "TextAnalysisDatabase"
+        }, 
+        "Description": "A query that selects turn by turn sentiments", 
+        "Name": "Select Turn by turn sentiments", 
+        "QueryString": {
+          "Fn::Join": [
+            "", 
+            [
+              "WITH dataset AS ( select asset_id as id, call_resolution_status as resolution, call_motivation_status as motivation, turns from ", 
+              "\"text_analysis_database-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }, 
+              "\".\"", 
+              "text_analysis_output_dev_", 
+              {
+                "Fn::Join": [
+                  "_", 
+                  {
+                    "Fn::Split": [
+                      "-", 
+                      {
+                        "Ref": "ServicePrefix"
+                      }
+                    ]
+                  }
+                ]
+              }, 
+              "\"", 
+              ") select id, turn.turn, turn.channel, resolution, motivation, turn.sentiment.Sentiment, turn.sentiment.SentimentScore, turn.text from dataset cross join unnest(turns) t(turn)"
+            ]
+          ]
+        }
+      }
+    }, 
+    "ComprehendFullAccessPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy", 
+      "Properties": {
+        "ManagedPolicyName": {
+          "Fn::Join": [
+            "", 
+            [
+              "comprehend-full-access-policy", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "PolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "s3:Put*", 
+                "s3:ListBucket", 
+                "s3:Get*"
+              ], 
+              "Resource": "*"
+            }, 
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "lambda:InvokeFunction"
+              ], 
+              "Resource": "*"
+            }, 
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "comprehend:Create*", 
+                "comprehend:Describe*", 
+                "comprehend:Batch*", 
+                "comprehend:Delete*", 
+                "comprehend:Detect*", 
+                "comprehend:List*", 
+                "comprehend:Start*", 
+                "comprehend:Stop*", 
+                "comprehend:ClassifyDocument"
+              ], 
+              "Resource": "*"
+            }, 
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "events:Disable*"
+              ], 
+              "Resource": "*"
+            }, 
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "dynamodb:*"
+              ], 
+              "Resource": {
+                "Fn::Join": [
+                  "", 
+                  [
+                    "arn:aws:dynamodb:", 
+                    {
+                      "Ref": "AWS::Region"
+                    }, 
+                    {
+                      "Fn::Sub": ":${AWS::AccountId}:table/"
+                    }, 
+                    {
+                      "Ref": "StatusTable"
+                    }
+                  ]
+                ]
+              }
+            }, 
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "iam:PassRole"
+              ], 
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ComprehendDataAccessRole", 
+                    "Arn"
+                  ]
+                }, 
+                {
+                  "Fn::GetAtt": [
+                    "TextAnalysisRole", 
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }, 
+    "SnsNotificationPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy", 
+      "Properties": {
+        "ManagedPolicyName": {
+          "Fn::Join": [
+            "", 
+            [
+              "sns-notification", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "PolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Effect": "Allow", 
+              "Action": [
+                "sns:*"
+              ], 
+              "Resource": [
+                {
+                  "Ref": "ThreatNotificationTopic"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }, 
+    "ThreatNotificationTopic": {
+      "Type": "AWS::SNS::Topic", 
+      "Properties": {
+        "Subscription": [
+          {
+            "Endpoint": {
+              "Ref": "NotificationEmail"
+            }, 
+            "Protocol": "email"
+          }
+        ], 
+        "DisplayName": {
+          "Fn::Join": [
+            "", 
+            [
+              "threat-notification", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "TopicName": {
+          "Fn::Join": [
+            "", 
+            [
+              "threat-notification", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "CleanUpS3Buckets": {
+      "DependsOn": [
+        "ComprehendCallResolutionBucket", 
+        "ComprehendCallMotivationBucket", 
+        "TranscriptionOutput", 
+        "TranscriptionAudioFiles", 
+        "SplitTranscriptOutput", 
+        "TextAnalysisOutput", 
+        "TextAnalysisAthena", 
+        "PortalBucket"
+      ], 
+      "Type": "Custom::CleanUpS3Buckets", 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CleanUpS3BucketsFunction", 
+            "Arn"
+          ]
+        }, 
+        "Buckets": [
+          {
+            "Ref": "ComprehendCallResolutionBucket"
+          }, 
+          {
+            "Ref": "ComprehendCallMotivationBucket"
+          }, 
+          {
+            "Ref": "TranscriptionOutput"
+          }, 
+          {
+            "Ref": "TranscriptionAudioFiles"
+          }, 
+          {
+            "Ref": "SplitTranscriptOutput"
+          }, 
+          {
+            "Ref": "TextAnalysisOutput"
+          }, 
+          {
+            "Ref": "TextAnalysisAthena"
+          }, 
+          {
+            "Ref": "PortalBucket"
+          }
+        ]
+      }
+    }, 
+    "CleanUpS3BucketsFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "import json\nimport logging\nimport threading\nimport boto3\nimport cfnresponse\n\ns3r = boto3.resource('s3')\ns3c = boto3.client('s3')\n\ndef delete_objects(bucket):\n    print(\"Collecting data from\" + bucket)\n    paginator = s3c.get_paginator('list_object_versions')\n    result = paginator.paginate(Bucket=bucket)\n    objects = []\n    for page in result:\n        try:\n            for k in page['Versions']:\n                objects.append({'Key': k['Key'], 'VersionId': k['VersionId']})\n            try:\n                for k in page['DeleteMarkers']:\n                    version = k['VersionId']\n                    key = k['Key']\n                    objects.append({'Key': key, 'VersionId': version})\n            except Exception as e:\n                print(e)\n                pass\n            print(\"deleting objects\")\n            s3c.delete_objects(Bucket=bucket, Delete={'Objects': objects})\n        except Exception as e:\n            print(e)\n            pass\n    print(\"bucket already empty\")\n\n\ndef timeout(event, context):\n    logging.error('Execution is about to time out, sending failure response to CloudFormation')\n    cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)\n\n\ndef handler(event, context):\n    # make sure we send a failure to CloudFormation if the function is going to timeout\n    timer = threading.Timer((context.get_remaining_time_in_millis() / 1000.00) - 0.5, timeout, args=[event, context])\n    timer.start()\n\n    print('Received event: %s' % json.dumps(event))\n    status = cfnresponse.SUCCESS\n    try:\n        buckets = event['ResourceProperties']['Buckets']\n        if event['RequestType'] == 'Delete':\n            for bucket in buckets:\n                delete_objects(bucket)\n        else:\n            print(\"Nothing to do\")\n    except Exception as e:\n        logging.error('Exception: %s' % e, exc_info=True)\n        status = cfnresponse.FAILED\n    finally:\n        timer.cancel()\n        cfnresponse.send(event, context, status, {}, None)\n"
+        }, 
+        "Description": "Empty the S3 Bucket", 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "S3CleanUpRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.6", 
+        "Timeout": 240
+      }
+    }, 
+    "S3CleanUpRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole", 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ], 
+          "Version": "2012-10-17"
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Path": "/", 
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:PutObject", 
+                    "s3:DeleteObject", 
+                    "s3:GetObject", 
+                    "s3:ListBucket", 
+                    "s3:ListBucketVersions", 
+                    "s3:DeleteObjectVersion", 
+                    "s3:GetObjectVersion", 
+                    "s3:GetBucketVersioning"
+                  ], 
+                  "Effect": "Allow", 
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "ComprehendCallResolutionBucket", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "ComprehendCallMotivationBucket", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "TranscriptionOutput", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "TranscriptionAudioFiles", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "SplitTranscriptOutput", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "TextAnalysisOutput", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "TextAnalysisAthena", 
+                        "Arn"
+                      ]
+                    }, 
+                    {
+                      "Fn::GetAtt": [
+                        "PortalBucket", 
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              ], 
+              "Version": "2012-10-17"
+            }, 
+            "PolicyName": "Empty-bucket"
+          }
+        ]
+      }
+    }, 
+    "ComprehendCleanup": {
+      "Type": "Custom::ComprehendCleanup", 
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "ComprehendCleanupFunction", 
+            "Arn"
+          ]
+        }, 
+        "MotivationEndpointArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:aws:comprehend:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":document-classifier-endpoint/", 
+              {
+                "Ref": "CallMotivationClassifierName"
+              }, 
+              "Endpoint"
+            ]
+          ]
+        }, 
+        "ResolutionEndpointArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:aws:comprehend:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":document-classifier-endpoint/", 
+              {
+                "Ref": "CallResolutionClassifierName"
+              }, 
+              "Endpoint"
+            ]
+          ]
+        }, 
+        "MotivationClassifierArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:aws:comprehend:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":document-classifier/", 
+              {
+                "Ref": "CallMotivationClassifierName"
+              }
+            ]
+          ]
+        }, 
+        "ResolutionClassifierArn": {
+          "Fn::Join": [
+            "", 
+            [
+              "arn:aws:comprehend:", 
+              {
+                "Ref": "AWS::Region"
+              }, 
+              ":", 
+              {
+                "Ref": "AWS::AccountId"
+              }, 
+              ":document-classifier/", 
+              {
+                "Ref": "CallResolutionClassifierName"
+              }
+            ]
+          ]
+        }
+      }
+    }, 
+    "ComprehendCleanupFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Description": "Empty the S3 Bucket", 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "ComprehendFullAccessRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.6", 
+        "Timeout": 240, 
+        "Code": {
+          "ZipFile": "import json\nimport logging\nimport threading\nimport boto3\nimport cfnresponse\n\ncomprehend = boto3.client('comprehend')\n\ndef endpoint_exists(arn):\n    try:\n        endpoint = comprehend.describe_endpoint(\n            EndpointArn=arn\n        )\n        return True\n    except Exception as e:\n        return False\n\n\ndef classifier_exists(arn):\n    try:\n        endpoints = comprehend.describe_document_classifier(\n            Filter={\n                'ModelArn': arn\n            }\n        )\n        return True\n    except Exception as e:\n        return False\n\n\ndef timeout(event, context):\n    logging.error('Execution is about to time out, sending failure response to CloudFormation')\n    cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)\n\n\ndef handler(event, context):\n    # make sure we send a failure to CloudFormation if the function is going to timeout\n    timer = threading.Timer((context.get_remaining_time_in_millis() / 1000.00) - 0.5, timeout, args=[event, context])\n    timer.start()\n\n    print('Received event: %s' % json.dumps(event))\n    status = cfnresponse.SUCCESS\n    try:\n        mot_endpoint_arn = event['ResourceProperties']['MotivationEndpointArn']\n        res_endpoint_arn = event['ResourceProperties']['ResolutionEndpointArn']\n        mot_classifier_arn = event['ResourceProperties']['MotivationClassifierArn']\n        res_classifier_arn = event['ResourceProperties']['ResolutionClassifierArn']\n\n        if event['RequestType'] == 'Delete':\n            mot_endpoint_exists = endpoint_exists(mot_endpoint_arn)\n            res_endpoint_exists = endpoint_exists(res_endpoint_arn)\n            mot_classifier_exists = classifier_exists(mot_classifier_arn)\n            res_classifier_exists = classifier_exists(res_classifier_arn)\n            if mot_endpoint_exists is True:\n                print('deleting ' + mot_endpoint_arn)\n                comprehend.delete_endpoint(\n                    EndpointArn=mot_endpoint_arn\n                )\n            if res_endpoint_exists is True:\n                print('deleting ' + res_endpoint_arn)\n                comprehend.delete_endpoint(\n                    EndpointArn=res_endpoint_arn\n                )\n            if mot_classifier_exists is True:\n                print('deleting ' + mot_classifier_arn)\n                comprehend.delete_document_classifier(\n                    DocumentClassifierArn=mot_classifier_arn\n                )\n            if res_classifier_exists is True:\n                print('deleting ' + res_classifier_arn)\n                comprehend.delete_document_classifier(\n                    DocumentClassifierArn=res_classifier_arn\n                )\n        else:\n            print(\"Nothing to do\")\n    except Exception as e:\n        logging.error('Exception: %s' % e, exc_info=True)\n        status = cfnresponse.FAILED\n    finally:\n        timer.cancel()\n        cfnresponse.send(event, context, status, {}, None)\n"
+        }
+      }
+    }, 
+    "GatewayResponseDefault4XX": {
+      "Type": "AWS::ApiGateway::GatewayResponse", 
+      "Properties": {
+        "ResponseParameters": {
+          "gatewayresponse.header.Access-Control-Allow-Origin": "'*'", 
+          "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+        }, 
+        "ResponseType": "DEFAULT_4XX", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "GatewayResponseDefault5XX": {
+      "Type": "AWS::ApiGateway::GatewayResponse", 
+      "Properties": {
+        "ResponseParameters": {
+          "gatewayresponse.header.Access-Control-Allow-Origin": "'*'", 
+          "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+        }, 
+        "ResponseType": "DEFAULT_5XX", 
+        "RestApiId": {
+          "Ref": "Api"
+        }
+      }
+    }, 
+    "Api": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "", 
+            [
+              "api", 
+              "-dev-", 
+              {
+                "Ref": "ServicePrefix"
+              }
+            ]
+          ]
+        }, 
+        "BinaryMediaTypes": [
+          "image/png", 
+          "image/jpg", 
+          "image/gif", 
+          "image/x-icon", 
+          "application/octet-stream"
+        ]
+      }
+    }, 
+    "PortalBucket": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true, 
+          "BlockPublicPolicy": true, 
+          "IgnorePublicAcls": true, 
+          "RestrictPublicBuckets": true
+        }, 
+        "WebsiteConfiguration": {
+          "IndexDocument": {
+            "Ref": "DefaultRoot"
+          }, 
+          "ErrorDocument": {
+            "Ref": "ErrorPage"
+          }
+        }
+      }
+    }, 
+    "CloudFrontOriginAccessIdentity": {
+      "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity", 
+      "Properties": {
+        "CloudFrontOriginAccessIdentityConfig": {
+          "Comment": {
+            "Ref": "PortalBucket"
+          }
+        }
+      }
+    }, 
+    "PortalBucketReadPolicy": {
+      "Type": "AWS::S3::BucketPolicy", 
+      "Properties": {
+        "Bucket": {
+          "Ref": "PortalBucket"
+        }, 
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:GetObject", 
+              "Effect": "Allow", 
+              "Resource": {
+                "Fn::Join": [
+                  "", 
+                  [
+                    "arn:aws:s3:::", 
+                    {
+                      "Ref": "PortalBucket"
+                    }, 
+                    "/*"
+                  ]
+                ]
+              }, 
+              "Principal": {
+                "CanonicalUser": {
+                  "Fn::GetAtt": [
+                    "CloudFrontOriginAccessIdentity", 
+                    "S3CanonicalUserId"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "CloudFrontDistribution": {
+      "Type": "AWS::CloudFront::Distribution", 
+      "DependsOn": [
+        "PortalBucket"
+      ], 
+      "Properties": {
+        "DistributionConfig": {
+          "DefaultRootObject": {
+            "Fn::Join": [
+              "", 
+              [
+                "/", 
+                {
+                  "Ref": "DefaultRoot"
+                }
+              ]
+            ]
+          }, 
+          "Enabled": true, 
+          "HttpVersion": "http2", 
+          "Origins": [
+            {
+              "DomainName": {
+                "Fn::GetAtt": [
+                  "PortalBucket", 
+                  "DomainName"
+                ]
+              }, 
+              "Id": "s3origin", 
+              "S3OriginConfig": {
+                "OriginAccessIdentity": {
+                  "Fn::Join": [
+                    "", 
+                    [
+                      "origin-access-identity/cloudfront/", 
+                      {
+                        "Ref": "CloudFrontOriginAccessIdentity"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }, 
+            {
+              "DomainName": {
+                "Fn::Join": [
+                  "", 
+                  [
+                    {
+                      "Ref": "Api"
+                    }, 
+                    ".execute-api.", 
+                    {
+                      "Ref": "AWS::Region"
+                    }, 
+                    ".amazonaws.com"
+                  ]
+                ]
+              }, 
+              "CustomOriginConfig": {
+                "HTTPSPort": "443", 
+                "OriginProtocolPolicy": "https-only"
+              }, 
+              "OriginPath": "/dev", 
+              "Id": "apigatewayorigin"
+            }
+          ], 
+          "PriceClass": "PriceClass_All", 
+          "CustomErrorResponses": [
+            {
+              "ErrorCode": 403, 
+              "ResponseCode": 200, 
+              "ResponsePagePath": {
+                "Fn::Join": [
+                  "", 
+                  [
+                    "/", 
+                    {
+                      "Ref": "DefaultRoot"
+                    }
+                  ]
+                ]
+              }
+            }, 
+            {
+              "ErrorCode": 404, 
+              "ResponseCode": 200, 
+              "ResponsePagePath": {
+                "Fn::Join": [
+                  "", 
+                  [
+                    "/", 
+                    {
+                      "Ref": "DefaultRoot"
+                    }
+                  ]
+                ]
+              }
+            }
+          ], 
+          "DefaultCacheBehavior": {
+            "AllowedMethods": [
+              "GET", 
+              "HEAD", 
+              "OPTIONS"
+            ], 
+            "CachedMethods": [
+              "GET", 
+              "HEAD", 
+              "OPTIONS"
+            ], 
+            "Compress": true, 
+            "DefaultTTL": 3600, 
+            "ForwardedValues": {
+              "Cookies": {
+                "Forward": "none"
+              }, 
+              "QueryString": false
+            }, 
+            "MaxTTL": 86400, 
+            "MinTTL": 60, 
+            "TargetOriginId": "s3origin", 
+            "ViewerProtocolPolicy": "redirect-to-https"
+          }, 
+          "CacheBehaviors": [
+            {
+              "AllowedMethods": [
+                "DELETE", 
+                "GET", 
+                "HEAD", 
+                "OPTIONS", 
+                "PATCH", 
+                "POST", 
+                "PUT"
+              ], 
+              "CachedMethods": [
+                "GET", 
+                "HEAD", 
+                "OPTIONS"
+              ], 
+              "Compress": true, 
+              "DefaultTTL": 5000, 
+              "MaxTTL": 10000, 
+              "MinTTL": 60, 
+              "ForwardedValues": {
+                "Headers": [
+                  "Accept", 
+                  "Referer", 
+                  "Authorization", 
+                  "Content-Type"
+                ], 
+                "QueryString": true
+              }, 
+              "PathPattern": "/api/*", 
+              "TargetOriginId": "apigatewayorigin", 
+              "ViewerProtocolPolicy": "https-only"
+            }
+          ]
+        }
+      }
+    }
+  }, 
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    }, 
+    "TranscribeJobProducerLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "TranscribeJobProducerLambdaVersionuUWpj61zZb74nAOOD5EyTU7Mimyd1NBSXAfqvmJRc"
+      }
+    }, 
+    "SplitTranscriptLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "SplitTranscriptLambdaVersionjicBtPNhIW8Q153XZnDBoGL8bBy62UtlR9c8RXt0A"
+      }
+    }, 
+    "AnalyseTextLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "AnalyseTextLambdaVersionNvpHFIoAeXib8hglMWXmpqwSoTkeIhLI7xr0qCjZCQY"
+      }
+    }, 
+    "GetTranscriptsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "GetTranscriptsLambdaVersionBMDOKyLmd09AeFJkkEv3jxouUy11AJuMByh1W2XZo"
+      }
+    }, 
+    "GetAudioLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "GetAudioLambdaVersionv1YDCft32Ul0AmTZp58GltKjVJrRxGfgETFsRGUTU"
+      }
+    }, 
+    "GetSentimentLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "GetSentimentLambdaVersionjzGED65H96phijF85kKsVhZlRLhJ8DjWcDdIy4JfBA"
+      }
+    }, 
+    "GetPresignedUrlLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "GetPresignedUrlLambdaVersionAMpaQh8shicDTvgQ2rikiB6qtBz8hTjju5G146cNb4"
+      }
+    }, 
+    "UpdateStatusLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "UpdateStatusLambdaVersionnWE4mHiwfU2XyL3E1BimFtdzXpe4lkKGEYLwPKMRSa8"
+      }
+    }, 
+    "QuickSightFederationFunctionLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "QuickSightFederationFunctionLambdaVersion6VHIXA1Ojng88XtFfXyxaIiv8eZ2ZVEgQ7BaEczyw"
+      }
+    }, 
+    "CreateCallResolutionClassiferLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "CreateCallResolutionClassiferLambdaVersionAtVmI2H7taQVN2S5Zkqvs9I9l7SOdjbdpfL4XObbWdk"
+      }
+    }, 
+    "CreateCallMotivationClassifierLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "CreateCallMotivationClassifierLambdaVersionXlQb7SS6rGJJQmAj3NvSkZGy9maWqtkip65YhL2ikU"
+      }
+    }, 
+    "CreateCallResolutionEndpointLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "CreateCallResolutionEndpointLambdaVersionUVQicfWZ5yuJkgg7QGF2UQANry9YpIHMcHcWW2MudA"
+      }
+    }, 
+    "CreateCallMotivationEndpointLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version", 
+      "Value": {
+        "Ref": "CreateCallMotivationEndpointLambdaVersioniiv9kCq4Cj5drMSwnXEOyVUDDt6Zz19Vxa5Dw5FpQ"
+      }
+    }, 
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint", 
+      "Value": {
+        "Fn::Join": [
+          "", 
+          [
+            "https://", 
+            {
+              "Ref": "Api"
+            }, 
+            ".execute-api.", 
+            {
+              "Ref": "AWS::Region"
+            }, 
+            ".", 
+            {
+              "Ref": "AWS::URLSuffix"
+            }, 
+            "/dev"
+          ]
+        ]
+      }
+    }, 
+    "Stage": {
+      "Value": "dev"
+    }, 
+    "ApiGatewayDomain": {
+      "Value": {
+        "Fn::Join": [
+          "", 
+          [
+            {
+              "Ref": "Api"
+            }, 
+            ".execute-api.", 
+            {
+              "Ref": "AWS::Region"
+            }, 
+            ".amazonaws.com"
+          ]
+        ]
+      }
+    }, 
+    "CognitoDomain": {
+      "Value": {
+        "Fn::Sub": "${CognitoDomain}.auth.${AWS::Region}.amazoncognito.com"
+      }
+    }, 
+    "UserPoolId": {
+      "Value": {
+        "Ref": "UserPool"
+      }
+    }, 
+    "UserPoolClientId": {
+      "Value": {
+        "Ref": "UserPoolClient"
+      }
+    }, 
+    "IdentityPoolId": {
+      "Value": {
+        "Ref": "IdentityPool"
+      }
+    }, 
+    "TranscriptionAudioFiles": {
+      "Value": {
+        "Ref": "TranscriptionAudioFiles"
+      }
+    }, 
+    "ComprehendCallResolutionBucket": {
+      "Value": {
+        "Ref": "ComprehendCallResolutionBucket"
+      }
+    }, 
+    "ComprehendCallMotivationBucket": {
+      "Value": {
+        "Ref": "ComprehendCallMotivationBucket"
+      }
+    }, 
+    "UserPoolArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "UserPool", 
+          "Arn"
+        ]
+      }
+    }, 
+    "QuickSightUserRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "QuickSightUserRole", 
+          "Arn"
+        ]
+      }
+    }, 
+    "PortalBucket": {
+      "Value": {
+        "Ref": "PortalBucket"
+      }
+    }, 
+    "PortalBucketArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "PortalBucket", 
+          "Arn"
+        ]
+      }
+    }, 
+    "CloudFrontDistributionId": {
+      "Value": {
+        "Ref": "CloudFrontDistribution"
+      }
+    }, 
+    "CloudFrontDistributionName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "CloudFrontDistribution", 
+          "DomainName"
+        ]
+      }
+    }, 
+    "UserPoolClient": {
+      "Value": {
+        "Ref": "UserPoolClient"
+      }
+    }, 
+    "ServicePrefix": {
+      "Value": {
+        "Ref": "ServicePrefix"
+      }
+    }
+  }, 
+  "Parameters": {
+    "AgentChannel": {
+      "Type": "Number", 
+      "Default": 0, 
+      "Description": "Left(0), or Right(1). Customer will be set to the other channel."
+    }, 
+    "AgentSpeakerLabel": {
+      "Type": "Number", 
+      "Default": 0, 
+      "Description": "First speaker(0) or last speaker(1). Customer will be set to the other label."
+    }, 
+    "ServicePrefix": {
+      "Type": "String", 
+      "Default": "aws-icc", 
+      "Description": "A prefix to make resource names unique"
+    }, 
+    "CustomVocabularyName": {
+      "Type": "String", 
+      "Default": "custom-vocabulary", 
+      "Description": "The name of the Amazon Transcribe Custom Vocabulary"
+    }, 
+    "CallResolutionClassifierName": {
+      "Type": "String", 
+      "Default": "call-resolution", 
+      "Description": "The name of the Call Resolution Classifier"
+    }, 
+    "CallMotivationClassifierName": {
+      "Type": "String", 
+      "Default": "call-motivation", 
+      "Description": "The name of the Call Motivation Classifier"
+    }, 
+    "UserPoolName": {
+      "Type": "String", 
+      "Default": "MyUserPool"
+    }, 
+    "UserPoolDomainName": {
+      "Type": "String", 
+      "Default": "icc-dev"
+    }, 
+    "IdentityPoolName": {
+      "Type": "String", 
+      "Default": "MyIdentityPool"
+    }, 
+    "QuickSightUserRoleName": {
+      "Type": "String", 
+      "Default": "QuickSightUserRole"
+    }, 
+    "QuickSightUserName": {
+      "Type": "String", 
+      "Default": "dkubi"
+    }, 
+    "UserPolicyName": {
+      "Type": "String", 
+      "Default": "MyUserPolicy"
+    }, 
+    "AllowedOrigins": {
+      "Type": "List<String>", 
+      "Default": "*"
+    }, 
+    "DefaultRoot": {
+      "Description": "The default path for the index document.", 
+      "Type": "String", 
+      "Default": "index.html"
+    }, 
+    "ErrorPage": {
+      "Description": "The path of the error page for the website.", 
+      "Type": "String", 
+      "Default": "error.html"
+    }, 
+    "NotificationEmail": {
+      "Type": "String", 
+      "Default": "test@example.com"
+    }, 
+    "QSS3KeyPrefix": {
+      "Type": "String", 
+      "Default": "quickstart-onica-post-call-analytics/"
+    }, 
+    "ServerlessDeploymentBucket": {
+      "Default": "", 
+      "Type": "String", 
+      "Description": "The bucket to which the lambda zips are deployed to"
+    }
+  }
+}

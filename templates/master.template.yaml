@@ -1,0 +1,290 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This template creates all the necessary resources to run audio voice analysis
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Amazon Intelligent Contact Center Configurations
+        Parameters:
+          - CustomVocabularyName
+          - UserPoolName
+          - UserPoolDomainName
+          - IdentityPoolName
+          - UserPolicyName
+          - AllowedOrigins
+          - NotificationEmail
+          - AgentChannel
+          - AgentSpeakerLabel
+          - CallResolutionClassifierName
+          - CallMotivationClassifierName
+    ParameterLabels:
+      CustomVocabularyName:
+        default: Custom Vocabulary Name
+      UserPoolName:
+        default: User Pool Name
+      UserPoolDomainName:
+        default: User Pool Domain Name
+      IdentityPoolName:
+        default: Identity Pool Name
+      UserPolicyName:
+        default: User Policy Name
+      QuickSightUserRoleName:
+        default: QuickSight User Role Name
+      AllowedOrigins:
+        default: Allowed Origins
+      NotificationEmail:
+        default: Contact email
+      AgentChannel:
+        default: Agent channel for multi-channel audio
+      AgentSpeakerLabel:
+        default: Agent speaker label for single-channel audio
+      CallResolutionClassifierName:
+        default: Display name of the call resolution classifier in Amazon Comprehend
+      CallMotivationClassifierName:
+        default: Display name of the call motivation classifier in Amazon Comprehend
+      QSS3BucketName:
+        default: Your Bucket Configured for Quickstart
+      QSS3BucketRegion:
+        default: Region of Quickstart bucket
+      QSS3KeyPrefix:
+        default: S3 prefix where you want to sync you git Repo
+      
+Parameters:
+  AgentChannel:
+    Type: Number
+    Default: 0
+    Description: Left(0), or Right(1). Customer will be set to the other channel.
+  AgentSpeakerLabel:
+    Type: Number
+    Default: 0
+    Description: First speaker(0) or last speaker(1). Customer will be set to the other label.
+  CustomVocabularyName: 
+    Type: String
+    Default: custom-vocabulary
+    Description: The name of the Amazon Transcribe Custom Vocabulary
+  UserPoolName:
+    Type: String
+    Default: MyUserPool
+  UserPoolDomainName:
+    Type: String
+    Default: icc-domain
+  IdentityPoolName:
+    Type: String
+    Default: MyIdentityPool
+  UserPolicyName:
+    Type: String
+    Default: MyUserPolicy
+  AllowedOrigins:
+    Type: String
+    Default: '*'
+  DefaultRoot:
+    Description: 'The default path for the index document.'
+    Type: String
+    Default: 'index.html'
+  ErrorPage:
+    Description: 'The path of the error page for the website.'
+    Type: String
+    Default: 'error.html'
+  QuickSightUserRoleName:
+    Type: String
+    Default: QuickSightUserRole
+  CallResolutionClassifierName:
+    Type: String
+    Default: call-resolution
+    Description: The name of the Call Resolution Classifier
+  CallMotivationClassifierName:
+    Type: String
+    Default: call-motivation
+    Description: The name of the Call Motivation Classifier
+  NotificationEmail:
+    Type: String
+    Default: 'test@example.com'
+    AllowedPattern: '^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$'
+  QSS3BucketName:
+    Type: String
+    Description: >-
+      The S3 bucket created for your copy of Quick Start assets
+    Default: aws-quickstart
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted.'
+    Type: String
+  QSS3KeyPrefix:
+    Type: String
+    Description: The S3 key name prefix used for your copy of Quick Start assets
+    Default: quickstart-onica-post-call-analytics/
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+
+Resources:
+  RandomString:
+    Type: Custom::RandomString
+    Properties:
+      ServiceToken: !GetAtt 'RandomStringFunction.Arn'
+      Number: 8
+  RandomStringFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Timeout: 30
+      Role: !GetAtt 'RandomStringRole.Arn'
+      Runtime: python3.6
+      Code:
+        ZipFile: |
+          import base64
+          import json
+          import logging
+          import string
+          import random
+          import boto3
+          from botocore.vendored import requests
+          import cfnresponse
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def random_string(size=6):
+            return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
+
+          def lambda_handler(event, context):
+            logger.info('got event {}'.format(event))
+            responseData = {}
+
+            if event['RequestType'] == 'Create':
+              number = int(event['ResourceProperties'].get('Number', 6))
+              rs = random_string(number)
+              responseData['upper'] = rs.upper()
+              responseData['lower'] = rs.lower()
+
+            else: # delete / update
+              rs = event['PhysicalResourceId'] 
+              responseData['upper'] = rs.upper()
+              responseData['lower'] = rs.lower()
+                          
+            logger.info('responseData {}'.format(responseData))
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, responseData['lower'])
+  RandomStringRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+          Condition: {}
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  CopyLambdaArtifactsStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - RandomString
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/copy-artifacts.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        QSS3BucketName: !Ref QSS3BucketName
+        Nonce: "1"
+  IntelligentContactCenterStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - RandomString
+      - CopyLambdaArtifactsStack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-icc.template'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        ServerlessDeploymentBucket: !GetAtt CopyLambdaArtifactsStack.Outputs.LambdaArtifactsBucket
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        ServicePrefix: !Sub '${RandomString}'
+        CustomVocabularyName: !Ref CustomVocabularyName
+        UserPoolName: !Ref UserPoolName
+        UserPoolDomainName: !Ref UserPoolDomainName
+        IdentityPoolName: !Ref IdentityPoolName
+        QuickSightUserRoleName: !Ref QuickSightUserRoleName
+        UserPolicyName: !Ref UserPolicyName
+        AllowedOrigins: !Ref AllowedOrigins
+        DefaultRoot: !Ref DefaultRoot
+        ErrorPage: !Ref ErrorPage
+        CallResolutionClassifierName: !Ref CallResolutionClassifierName
+        CallMotivationClassifierName: !Ref CallMotivationClassifierName
+        NotificationEmail: !Ref NotificationEmail
+        AgentChannel: !Ref AgentChannel
+        AgentSpeakerLabel: !Ref AgentSpeakerLabel
+  DeployInfrastructureStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - RandomString
+      - IntelligentContactCenterStack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/deploy.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        QSS3BucketName: !Ref QSS3BucketName
+        TranscriptionAudioFiles: !GetAtt IntelligentContactCenterStack.Outputs.TranscriptionAudioFiles
+        ComprehendCallResolutionBucket: !GetAtt IntelligentContactCenterStack.Outputs.ComprehendCallResolutionBucket
+        ComprehendCallMotivationBucket: !GetAtt IntelligentContactCenterStack.Outputs.ComprehendCallMotivationBucket
+        Nonce: "1"
+  DeployICCDashboard:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - RandomString
+      - DeployInfrastructureStack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cloudfront.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        BaseApi: !GetAtt IntelligentContactCenterStack.Outputs.ServiceEndpoint
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        UserPoolId: !GetAtt IntelligentContactCenterStack.Outputs.UserPoolId
+        IdentityPoolId: !GetAtt IntelligentContactCenterStack.Outputs.IdentityPoolId
+        CognitoDomain: !GetAtt IntelligentContactCenterStack.Outputs.CognitoDomain
+        UserPoolArn: !GetAtt IntelligentContactCenterStack.Outputs.UserPoolArn
+        Stage: !GetAtt IntelligentContactCenterStack.Outputs.Stage
+        ApiGatewayDomain: !GetAtt IntelligentContactCenterStack.Outputs.ApiGatewayDomain
+        PortalBucket: !GetAtt IntelligentContactCenterStack.Outputs.PortalBucket
+        PortalBucketArn: !GetAtt IntelligentContactCenterStack.Outputs.PortalBucketArn
+        CloudFrontDistributionId: !GetAtt IntelligentContactCenterStack.Outputs.CloudFrontDistributionId
+        CloudFrontDistributionName: !GetAtt IntelligentContactCenterStack.Outputs.CloudFrontDistributionName
+        UserPoolClient: !GetAtt IntelligentContactCenterStack.Outputs.UserPoolClient
+
+Outputs:
+  ServerlessDeploymentBucket:
+    Value: !GetAtt CopyLambdaArtifactsStack.Outputs.LambdaArtifactsBucket
+  ServicePrefix:
+    Value: !Sub '${RandomString}'
+  CustomVocabularyName:
+    Value: !Ref CustomVocabularyName
+  UserPoolName:
+    Value: !Ref UserPoolName
+  IdentityPoolName:
+    Value: !Ref IdentityPoolName
+  QuickSightUserRoleName:
+    Value: !Ref QuickSightUserRoleName
+  UserPolicyName:
+    Value: !Ref UserPolicyName
+  AllowedOrigins:
+    Value: !Ref AllowedOrigins
+  PortalEndpoint:
+    Value: !GetAtt DeployICCDashboard.Outputs.DistributionDomainName
