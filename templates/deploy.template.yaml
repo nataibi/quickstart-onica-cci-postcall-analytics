@@ -69,7 +69,7 @@ Resources:
       Nonce: !Ref Nonce
       DestBucket: !Ref TranscriptionAudioFiles
       Objects:
-        - transcribe/vocabulary.txt
+        - assets/transcribe/vocabulary.txt
       SourceBucket: !Ref QSS3BucketName
       Prefix: !Ref QSS3KeyPrefix
     Type: AWS::CloudFormation::CustomResource
@@ -79,7 +79,7 @@ Resources:
       Nonce: !Ref Nonce
       DestBucket: !Ref ComprehendCallResolutionBucket
       Objects:
-        - training/resolution/train.csv
+        - assets/training/resolution/train.csv
       SourceBucket: !Ref QSS3BucketName
       Prefix: !Ref QSS3KeyPrefix
     Type: AWS::CloudFormation::CustomResource
@@ -89,7 +89,7 @@ Resources:
       Nonce: !Ref Nonce
       DestBucket: !Ref ComprehendCallMotivationBucket
       Objects:
-        - training/motivation/training.csv
+        - assets/training/motivation/training.csv
       SourceBucket: !Ref QSS3BucketName
       Prefix: !Ref QSS3KeyPrefix
     Type: AWS::CloudFormation::CustomResource

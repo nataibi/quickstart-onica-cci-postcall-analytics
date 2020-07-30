@@ -21,8 +21,8 @@ Resources:
       Nonce: !Ref Nonce
       DestBucket: !Ref LambdaArtifactsBucket
       Objects:
-        - packages/aws-icc.zip
-        - packages/custom-resources.zip
+        - functions/packages/aws-icc.zip
+        - functions/packages/custom-resources.zip
       SourceBucket: !Ref QSS3BucketName
       Prefix: !Ref QSS3KeyPrefix
     Type: AWS::CloudFormation::CustomResource

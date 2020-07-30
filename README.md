@@ -7,9 +7,14 @@ Setup:
 ```
 pipenv shell
 pipenv install
-./build.sh build --stage prod --region us-east-1
+./build.sh build --stage <stage-name> --region us-east-1
 ```
 
+Deploy:
+---
+```
+aws s3 sync . s3://<bucket-name>/<key-prefix>
+```
 
 Test:
 ---
