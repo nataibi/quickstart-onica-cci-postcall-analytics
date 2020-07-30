@@ -10,7 +10,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-transcribeJobProducer", 
@@ -61,7 +61,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-splitTranscript", 
@@ -115,7 +115,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-analyseText", 
@@ -202,7 +202,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-getTranscripts", 
@@ -253,7 +253,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-getAudio", 
@@ -307,7 +307,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-getSentiment", 
@@ -361,7 +361,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-getPresignedUrl", 
@@ -427,7 +427,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-updateStatus", 
@@ -484,7 +484,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-quickSightFederationFunction", 
@@ -526,7 +526,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-createCallResolutionClassifer", 
@@ -589,7 +589,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-createCallMotivationClassifier", 
@@ -652,7 +652,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-createCallResolutionEndpoint", 
@@ -714,7 +714,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/aws-icc.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aws-icc.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-createCallMotivationEndpoint", 
@@ -1279,7 +1279,7 @@
             "Ref": "ServerlessDeploymentBucket"
           }, 
           "S3Key": {
-            "Fn::Sub": "${QSS3KeyPrefix}packages/custom-resources.zip"
+            "Fn::Sub": "${QSS3KeyPrefix}functions/packages/custom-resources.zip"
           }
         }, 
         "FunctionName": "aws-icc-dev-custom-resource-existing-s3", 
@@ -1970,7 +1970,7 @@
         "MethodResponses": []
       }
     }, 
-    "ApiGatewayDeployment1596060817981": {
+    "ApiGatewayDeployment1596082137591": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
