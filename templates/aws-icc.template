@@ -3328,7 +3328,7 @@
                 ]
               }, 
               "CustomOriginConfig": {
-                "HTTPSPort": "443", 
+                "HTTPSPort": 443, 
                 "OriginProtocolPolicy": "https-only"
               }, 
               "OriginPath": "/prod", 
