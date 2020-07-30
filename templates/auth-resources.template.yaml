@@ -1,3 +1,7 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates authorizer resources (qs-1r0eejdlm)
+
 Resources:
   ApiGatewayAuthorizer:
     Type: AWS::ApiGateway::Authorizer

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Call AnalyticsPortal Stack
+Description: Call AnalyticsPortal Stack (qs-1r0eejdp0)
 Parameters:
   DefaultRoot:
     Description: 'The default path for the index document.'

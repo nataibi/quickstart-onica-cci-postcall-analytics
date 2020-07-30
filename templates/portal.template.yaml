@@ -1,3 +1,6 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates portal resources (qs-1r0eejdqf)
 Resources:
   GatewayResponseDefault4XX:
     Type: 'AWS::ApiGateway::GatewayResponse'

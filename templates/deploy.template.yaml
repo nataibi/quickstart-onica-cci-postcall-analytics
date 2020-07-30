@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template copies the custom vocabulary file to the destination bucket
+Description: This template copies the custom vocabulary file to the destination bucket (qs-1r0eejdpj)
 Parameters:
   QSS3BucketName:
     Default: ""

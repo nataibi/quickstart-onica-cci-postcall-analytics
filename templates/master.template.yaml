@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: This template creates all the necessary resources to run audio voice analysis
+Description: This template creates all the necessary resources to run audio voice analysis (qs-1r0eejdoc)
 
 Metadata:
   AWS::CloudFormation::Interface:

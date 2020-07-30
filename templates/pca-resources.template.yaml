@@ -1,3 +1,6 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates authorizer resources (qs-1r0eejdq9)
 Resources:   
   ComprehendCallResolutionBucket:
     Type: AWS::S3::Bucket

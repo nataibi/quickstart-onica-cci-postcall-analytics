@@ -1,3 +1,7 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates Cleanup lambda resources (qs-1r0eejdr5)
+
 Resources:
   CleanUpS3Buckets:
     DependsOn: # Force this to run before attempting to delete buckets
