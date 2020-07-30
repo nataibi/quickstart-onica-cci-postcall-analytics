@@ -10,10 +10,10 @@ pipenv install
 ./build.sh build --stage <stage-name> --region us-east-1
 ```
 
-Deploy:
+Deploy: deploy only important files
 ---
 ```
-aws s3 sync . s3://<bucket-name>/<key-prefix>
+aws s3 sync . s3://quickstart-onica-dev-pca/icc-pca --exclude "functions/source/.serverless/*" --exclude "functions/source/node_modules/*" --exclude "assets/portal/node_modules/*" --exclude "assets/portal/*" --include "assets/portal/build/*" --exclude "assets/scripts/*" --exclude ".git/*"
 ```
 
 Test:
