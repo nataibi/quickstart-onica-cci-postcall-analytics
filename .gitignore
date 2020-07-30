@@ -26,3 +26,7 @@ assets/portal/build
 assets/portal/node_modules
 assets/portal/.env*
 !assets/portal/.env
+
+# Taskcat
+.taskcat/
+taskcat_outputs/
