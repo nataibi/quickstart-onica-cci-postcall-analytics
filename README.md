@@ -18,7 +18,7 @@ This Quick Start is available in all the AWS regions where the following service
 ### Architecture
 Deploying this Quick Start with default parameters builds the following architecture in the AWS Cloud.
 
-![Architecture diagram](./images/architecture.png)
+![Architecture diagram](./images/onica-pca-arch.png)
 
 The CloudFormation template sets up the following serverless architecture:
 * An S3 bucket that stores contact center audio recordings
@@ -45,7 +45,7 @@ Please make sure you have the following pre-requisites, before launch the CloudF
 ### Deployment steps
 1. Login to your AWS account.
 2. Use the region selector in the navigation bar to choose the AWS Region in which you want to deploy the solution. We recommend to use us-east-1.
-3. Click [Deploy](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/template?stackName=lex-kendra&templateURL=https://aws-quickstart.s3.amazonaws.com/quickstart-quantiphi-lex-kendra-backend/templates/lex_bot_kendra_master.template.yaml) to launch the CloudFormation template in your AWS Account. Click "Next".
+3. Click [Deploy](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/template?stackName=cci-pca&templateURL=https://aws-quickstart.s3.amazonaws.com/quickstart-onica-cci-postcall-analytics/templates/master.template.yaml) to launch the CloudFormation template in your AWS Account. Click "Next".
 4. In the 'Parameters' section, provide a stack name and review the parameter values. All the parameters have a default value. You may leave it as-is, and click Next.
 5. On 'Configure stack options' screen, click Next.
 6. Review the details, provide IAM_CAPABILITIES by clicking the check boxes under 'Capabilities' section, and click 'Create stack'. It will take approximately 20 minutes to create the stack.
