@@ -6,7 +6,7 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Amazon Intelligent Contact Center Configurations
+          default: Amazon intelligent contact center post-call analytics configuration
         Parameters:
           - CustomVocabularyName
           - UserPoolName
@@ -19,6 +19,12 @@ Metadata:
           - AgentSpeakerLabel
           - CallResolutionClassifierName
           - CallMotivationClassifierName
+      - Label:
+          default: AWS Quick Start configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
+          - QSS3BucketRegion
     ParameterLabels:
       CustomVocabularyName:
         default: Custom Vocabulary Name
@@ -45,11 +51,11 @@ Metadata:
       CallMotivationClassifierName:
         default: Display name of the call motivation classifier in Amazon Comprehend
       QSS3BucketName:
-        default: Your Bucket Configured for Quickstart
+        default: Quick Start S3 bucket name
       QSS3BucketRegion:
-        default: Region of Quickstart bucket
+        default: Quick Start S3 bucket region
       QSS3KeyPrefix:
-        default: S3 prefix where you want to sync you git Repo
+        default: Quick Start S3 key prefix
       
 Parameters:
   AgentChannel:
@@ -103,20 +109,25 @@ Parameters:
     Default: 'test@example.com'
     AllowedPattern: '^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$'
   QSS3BucketName:
-    Type: String
-    Description: >-
-      The S3 bucket created for your copy of Quick Start assets
-    Default: aws-quickstart
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Description: S3 bucket name for the Quick Start assets. Quick Start bucket name can
+      include numbers, lowercase letters, uppercase letters, and hyphens (-). It
+      cannot start or end with a hyphen (-).
+    Type: String
+    Default: aws-quickstart
+  QSS3KeyPrefix:
+    AllowedPattern: ^([0-9a-zA-Z-.]+/)*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), dots (.) and forward slash (/). The prefix should end with a forward slash (/).
+    Description:       S3 key prefix for the Quick Start assets. Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), dots
+      (.) and forward slash (/) and it should end with a forward slash (/).
+    Type: String
+    Default: quickstart-onica-cci-postcall-analytics/
   QSS3BucketRegion:
     Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted.'
+    Description: The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.
     Type: String
-  QSS3KeyPrefix:
-    Type: String
-    Description: The S3 key name prefix used for your copy of Quick Start assets
-    Default: quickstart-onica-post-call-analytics/
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
 
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
