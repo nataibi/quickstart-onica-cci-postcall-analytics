@@ -1,7 +1,6 @@
 functions/source/node_modules/
 assets/portal/node_modules/
 
-#taskcat
 .DS_Store
-.taskcat/
-taskcat_outputs/
+.taskcat
+taskcat_outputs
