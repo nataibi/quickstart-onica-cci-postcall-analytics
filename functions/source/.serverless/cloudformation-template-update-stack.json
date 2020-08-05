@@ -141,7 +141,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-transcribeJobProducer",
         "Handler": "transcribe/transcribeHandler.handler",
@@ -191,7 +191,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-splitTranscript",
         "Handler": "analysis/splitTranscript.handler",
@@ -244,7 +244,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-analyseText",
         "Handler": "analysis/analyseTranscript.handler",
@@ -330,7 +330,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-getTranscripts",
         "Handler": "api/getTranscripts.handler",
@@ -380,7 +380,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-getAudio",
         "Handler": "api/getAudio.handler",
@@ -433,7 +433,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-getSentiment",
         "Handler": "api/getSentiments.handler",
@@ -486,7 +486,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-getPresignedUrl",
         "Handler": "api/getPresignedUrl.handler",
@@ -551,7 +551,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-updateStatus",
         "Handler": "api/updateStatus.handler",
@@ -607,7 +607,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-quickSightFederationFunction",
         "Handler": "api/quicksightAuth.handler",
@@ -648,7 +648,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-createCallResolutionClassifer",
         "Handler": "classifiers/callResolutionClassifier.handler",
@@ -710,7 +710,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-createCallMotivationClassifier",
         "Handler": "classifiers/createMotivationClassifier.handler",
@@ -772,7 +772,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-createCallResolutionEndpoint",
         "Handler": "endpoints/callResolutionEnpoint.handler",
@@ -833,7 +833,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/aws-icc.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/aws-icc.zip"
         },
         "FunctionName": "aws-icc-prod-createCallMotivationEndpoint",
         "Handler": "endpoints/createMotivationEndpoint.handler",
@@ -1397,7 +1397,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aws-icc/prod/1596122553458-2020-07-30T15:22:33.458Z/custom-resources.zip"
+          "S3Key": "serverless/aws-icc/prod/1596656717357-2020-08-05T19:45:17.357Z/custom-resources.zip"
         },
         "FunctionName": "aws-icc-prod-custom-resource-existing-s3",
         "Handler": "s3/handler.handler",
@@ -2087,7 +2087,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1596122538116": {
+    "ApiGatewayDeployment1596656703888": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
