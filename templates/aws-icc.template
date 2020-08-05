@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Description": "The AWS CloudFormation template for this Serverless application (qs-1r0eejdoc)",
   "Resources": {
     "TranscribeJobProducerLambdaFunction": {
       "Type": "AWS::Lambda::Function",
