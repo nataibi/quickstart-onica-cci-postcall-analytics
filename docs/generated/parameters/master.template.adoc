@@ -1,0 +1,25 @@
+
+.Amazon intelligent contact center post-call analytics configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default Value|Description|Custom Vocabulary Name
+(`CustomVocabularyName`)|`custom-vocabulary`|The name of the Amazon Transcribe Custom Vocabulary|User Pool Name
+(`UserPoolName`)|`MyUserPool`|NO_DESCRIPTION|User Pool Domain Name
+(`UserPoolDomainName`)|`icc-domain`|NO_DESCRIPTION|Identity Pool Name
+(`IdentityPoolName`)|`MyIdentityPool`|NO_DESCRIPTION|User Policy Name
+(`UserPolicyName`)|`MyUserPolicy`|NO_DESCRIPTION|Allowed Origins
+(`AllowedOrigins`)|`*`|NO_DESCRIPTION|Contact email
+(`NotificationEmail`)|`test@example.com`|NO_DESCRIPTION|Agent channel for multi-channel audio
+(`AgentChannel`)|`0`|Left(0), or Right(1). Customer will be set to the other channel.|Agent speaker label for single-channel audio
+(`AgentSpeakerLabel`)|`0`|First speaker(0) or last speaker(1). Customer will be set to the other label.|Display name of the call resolution classifier in Amazon Comprehend
+(`CallResolutionClassifierName`)|`call-resolution`|The name of the Call Resolution Classifier|Display name of the call motivation classifier in Amazon Comprehend
+(`CallMotivationClassifierName`)|`call-motivation`|The name of the Call Motivation Classifier
+|===
+.AWS Quick Start configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default Value|Description|Quick Start S3 bucket name
+(`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 key prefix
+(`QSS3KeyPrefix`)|`quickstart-onica-cci-postcall-analytics/`|S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), dots (.) and forward slash (/) and it should end with a forward slash (/).|Quick Start S3 bucket region
+(`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.
+|===
