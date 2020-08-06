@@ -3,7 +3,7 @@ project:
   owner: quickstart-eng@amazon.com
   regions:
     - us-west-2
-  template: templates/master.template.yaml
+  template: templates/main.template.yaml
   parameters:
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
