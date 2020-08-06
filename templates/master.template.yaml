@@ -3,6 +3,8 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: This template creates all the necessary resources to run audio voice analysis (qs-1r0eejdoc)
 
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch CCI Post-call analytics"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
