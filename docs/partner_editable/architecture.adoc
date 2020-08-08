@@ -1,30 +1,25 @@
-Deploying this Quick Start for a new virtual private cloud (VPC) with
-*default parameters* builds the following _{partner-product-name}_ environment in the
-AWS Cloud.
+Deploying this Quick Start with *default parameters* builds the following _{partner-product-name}_ environment in the AWS Cloud.
 
 // Replace this example diagram with your own. Send us your source PowerPoint file. Be sure to follow our guidelines here : http://(we should include these points on our contributors giude)
 [#architecture1]
 .Quick Start architecture for _{partner-product-name}_ on AWS
-[link=images/architecture_diagram.png]
-image::../images/architecture_diagram.png[Architecture,width=648,height=439]
+[link=../images/onica-pca-arch.png]
+image::../../images/onica-pca-arch.png[Architecture,width=648,height=439]
 
 As shown in Figure 1, the Quick Start sets up the following:
 
-* A highly available architecture that spans two Availability Zones.*
-* A VPC configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*
-
-In the public subnets:
-
-* Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*
-* A Linux bastion host in an Auto Scaling group to allow inbound Secure
-Shell (SSH) access to EC2 instances in public and private subnets.*
-
-In the private subnets:
-// Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram.
-* <describe any additional components>.
-
-*The template that deploys the Quick Start into an existing VPC skips
-the components marked by asterisks and prompts you for your existing VPC
-configuration.
+* An S3 bucket that stores contact center audio recordings.
+* A Lambda function that transcribes the audio recordings to call transcripts.
+* An S3 bucket that stores the transcripts.
+* A DynamoDB table that stores audio URI, transcript URI, text analysis URI and job status.
+* A lambda function that separates turns from the transcript.
+* An S3 bucket that stores the separated turn transcripts.
+* A lambda function that analyses the separated transcripts.
+* An S3 bucket that stores the text analysis output.
+* A glue crawler that pulls metadata from the text analysis and a glue table.
+* An Athena Query that fetches turn by turn sentiment and scores.
+* Amazon API Gateway that exposes provisioning endpoints through HTTPS.
+* A dashboard integrated with QuickSight.
+* A CloudFront distribution to serve HTTPS request to an S3 Bucket hosting all the contents of the solution portal.
+* Amazon Cognito to manage users and give access to the solution portal.
+* An S3 bucket to host the portal website.
