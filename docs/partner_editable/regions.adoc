@@ -1,2 +1,9 @@
-- _us-east-1 (N. Virginia)_ (EXAMPLE)
-- _us-east-2 (Ohio)_ (EXAMPLE)
+This Quick Start is available in all the AWS regions where the following services are available:
+
+* AWS Glue
+* Amazon Athena
+* Amazon Transcribe
+* Amazon Comprehend
+* Amazon QuickSight
+* Amazon CloudFront
+* Amazon Cognito

@@ -1,6 +1,16 @@
 // Replace the content in <>
 // Describe or link to specific knowledge requirements; for example: “familiarity with basic concepts in the areas of networking, database operations, and data encryption” or “familiarity with <software>.”
 
-This Quick Start assumes familiarity with <knowledge expectations>.
+This Quick Start assumes familiarity with following AWS services.
+
+* https://docs.aws.amazon.com/comprehend/index.html[Amazon Comprehend^] uses natural language processing (NLP) to extract insights about the content of the call transcripts. It develops insights by recognizing the entities, key phrases, language, sentiments in the transcript.
+* https://console.aws.amazon.com/transcribe/home[Amazon Transcribe^] is a fully managed automatic speech recognition (ASR) service that makes it easy for us to convert audio conversations to text.
+* https://docs.aws.amazon.com/glue/index.html[AWS Glue^] is a fully managed ETL (extract, transform, and load) service that makes it simple and cost-effective to categorize data, clean it, enrich it, and move it reliably between various data stores. AWS Glue crawlers automatically infer database and table schema from the text analysis output file and stores the associated metadata in the AWS Glue Data Catalog.
+* https://docs.aws.amazon.com/athena/index.html[Amazon Athena^] is an interactive query service that makes it easy to analyze data directly in Amazon Simple Storage Service (Amazon S3) using standard SQL. You can use Athena to run ad-hoc queries against the text analysis bucket.
+* https://docs.aws.amazon.com/dynamodb/index.html[Amazon DynamoDB^] is a fully managed NoSQL database service that is used in the solution to store the Status of workload throughout.
+* https://docs.aws.amazon.com/lambda/index.html[AWS Lambda^] allows you to run code without provisioning or managing servers.
+* https://aws.amazon.com/documentation/cloudformation/[AWS CloudFormation^] enables you to create and provision AWS infrastructure deployments predictably and repeatedly. The entire solution’s infrastructure is built as Code with CloudFormation.
+* https://docs.aws.amazon.com/quicksight/latest/user/welcome.html[AWS QuickSight^] is a business analytics service you can use to build visualizations, perform ad hoc analysis, and get business insights from your data. In this solution we use QuickSight to get an aggregated view of the call transcripts insights. We use it to answer questions like “What was the most negative statement uttered by a customer?”
+
 
 

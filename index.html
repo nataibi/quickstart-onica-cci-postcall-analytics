@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Example Product Name on the AWS Cloud</title>
+<title>Contact Center Intelligence Post-call Analytics on the AWS Cloud</title>
 <style>
 
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -771,7 +771,7 @@ table p {
 <div id="toctitle"></div>
 <ul class="sectlevel1">
 <li><a href="#_overview">Overview</a></li>
-<li><a href="#_example_product_name_on_aws">Example Product Name on AWS</a></li>
+<li><a href="#_contact_center_intelligence_post_call_analytics_on_aws">Contact Center Intelligence Post-call Analytics on AWS</a></li>
 <li><a href="#_cost">Cost</a></li>
 <li><a href="#_software_licenses">Software licenses</a></li>
 <li><a href="#_architecture">Architecture</a></li>
@@ -789,11 +789,13 @@ table p {
 <li><a href="#_launch_cci_post_call_analytics">Launch CCI Post-call analytics</a></li>
 </ul>
 </li>
-<li><a href="#_test_the_deployment">Test the deployment</a></li>
-<li><a href="#_post_deployment_steps">Post deployment steps</a></li>
-<li><a href="#_best_practices_for_using_example_product_name_on_aws">Best practices for using Example Product Name on AWS</a></li>
-<li><a href="#_security">Security</a></li>
-<li><a href="#_other_useful_information">Other useful information</a></li>
+<li><a href="#_test_deployment">Test deployment</a></li>
+<li><a href="#_post_deployment_steps">Post deployment steps</a>
+<ul class="sectlevel2">
+<li><a href="#_subscribe_to_amazon_quicksight">Subscribe to Amazon QuickSight</a></li>
+<li><a href="#_create_new_analysis">Create new Analysis</a></li>
+</ul>
+</li>
 <li><a href="#_faq">FAQ</a></li>
 <li><a href="#_troubleshooting">Troubleshooting</a></li>
 <li><a href="#_send_us_feedback">Send us feedback</a></li>
@@ -809,17 +811,17 @@ table p {
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<h2 id="_example_product_name_on_the_aws_cloud" class="discrete text-center">Example Product Name on the AWS Cloud</h2>
+<h2 id="_contact_center_intelligence_post_call_analytics_on_the_aws_cloud" class="discrete text-center">Contact Center Intelligence Post-call Analytics on the AWS Cloud</h2>
 <h2 id="_quick_start_reference_deployment" class="discrete text-left text-center">Quick Start Reference Deployment</h2>
 <div class="imageblock text-center">
 <div class="content">
-<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-documentation-base/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
+<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-onica-cci-postcall-analytics/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>May, 2020</strong><br>
-<em>John Doe and Jane Doe - Example Company Name, Ltd.</em><br>
-<em>Jim Smith - AWS Global Partner SA, AWS + Joe Jones - Technical Product Manager, AWS</em></p>
+<p><strong>August, 2020</strong><br>
+<em>Onica, Inc.</em><br>
+<em>AWS</em></p>
 </div>
 <div class="admonitionblock tip text-left">
 <table>
@@ -828,14 +830,14 @@ table p {
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Visit our <a href="https://github.com/aws-quickstart/quickstart-documentation-base" target="_blank" rel="noopener">GitHub repository</a> for source files and to post feedback,
+Visit our <a href="https://github.com/aws-quickstart/quickstart-onica-cci-postcall-analytics" target="_blank" rel="noopener">GitHub repository</a> for source files and to post feedback,
 report bugs, or submit feature ideas for this Quick Start.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph text-left">
-<p>This Quick Start was created by Example Company Name, Ltd. in collaboration with Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that use AWS CloudFormation templates to deploy key technologies on AWS, following AWS best practices.</p>
+<p>This Quick Start was created by Onica, Inc. in collaboration with Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that use AWS CloudFormation templates to deploy key technologies on AWS, following AWS best practices.</p>
 </div>
 </div>
 </div>
@@ -843,10 +845,13 @@ report bugs, or submit feature ideas for this Quick Start.
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start reference deployment guide provides step-by-step instructions for deploying Example Product Name on the AWS Cloud.</p>
+<p>This Quick Start reference deployment guide provides step-by-step instructions for deploying Contact Center Intelligence Post-call Analytics on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start is for users who &lt;target audience and usage scenario&gt;</p>
+<p>This Quick Start is for users who wants to setup Contact Center Intelligence Post-call Analytics on AWS, to help drive deeper quality management insights through automatic analysis of contact center conversations, generating actionable insights such as product and service feedback loops that can be used to benefit the rest of the organization, or the best performing interactions such as those ending with a positive sentiment score.</p>
+</div>
+<div class="paragraph">
+<p>This Quick Start combines Amazon Transcribe for Automatic Speech Recognition to create a high-quality transcript for Amazon Comprehend to apply NLP to the transcript and analyze the interaction. Using Amazon QuickSight to view the data collected customers can quickly see the operational dashboards, reports and other deep insights collected from the post call data.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -865,10 +870,13 @@ collaborated with AWS on the content of the Quick Start.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_example_product_name_on_aws">Example Product Name on AWS</h2>
+<h2 id="_contact_center_intelligence_post_call_analytics_on_aws">Contact Center Intelligence Post-call Analytics on AWS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>&lt;Describe how the software works on AWS.&gt;</p>
+<p>This Quick Start deploys a serverless architecture to perform analytics on post call data for contact center solutions. It creates an S3 bucket where call recordings are dropped, which is processed using Amazon Transcribe for automatic speech recognition to create high quality transcript. Natural language processing is done on these transcripts using Amazon Comprehend and result is stored in S3 bucket and in DyanamoDb tables.</p>
+</div>
+<div class="paragraph">
+<p>You can also use Amazon QuickSight to view the collected data to quickly see the operational dashboards, and reports.</p>
 </div>
 </div>
 </div>
@@ -904,19 +912,7 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 <h2 id="_software_licenses">Software licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>These two paragraphs provide an example of the details you can provide. Provide links as appropriate.</p>
-</div>
-<div class="paragraph">
-<p>Example content below:</p>
-</div>
-<div class="paragraph">
-<p><em>&lt;license information&gt;This Quick Start requires a license for Example Product Name. To use the Quick Start in your production environment, sign up for a license at &lt;link&gt;. When you launch the Quick Start, place the license key in an S3 bucket and specify its location.</em></p>
-</div>
-<div class="paragraph">
-<p><em>If you don’t have a license, the Quick Start deploys with a trial license. The trial license gives you &lt;n&gt; days of free usage in a non-production environment. After this time, you can upgrade to a production license by following the instructions at &lt;link&gt;.</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;AMI information&gt;The Quick Start requires a subscription to the Amazon Machine Image (AMI) for Example Product Name, which is available from <a href="https://aws.amazon.com/marketplace/" target="_blank" rel="noopener">AWS Marketplace</a>. Additional pricing, terms, and conditions may apply. For instructions, see <a href="#step-2.-subscribe-to-the-software-ami">step 2</a> in the deployment section.</em></p>
+<p>This Quick Start doesn&#8217;t require any license or subscription.</p>
 </div>
 </div>
 </div>
@@ -924,15 +920,13 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Deploying this Quick Start for a new virtual private cloud (VPC) with
-<strong>default parameters</strong> builds the following <em>Example Product Name</em> environment in the
-AWS Cloud.</p>
+<p>Deploying this Quick Start with <strong>default parameters</strong> builds the following <em>Contact Center Intelligence Post-call Analytics</em> environment in the AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
-<a class="image" href="images/architecture_diagram.png"><img src="images/architecture_diagram.png" alt="Architecture" width="648" height="439"></a>
+<a class="image" href="../images/onica-pca-arch.png"><img src="../images/onica-pca-arch.png" alt="Architecture" width="648" height="439"></a>
 </div>
-<div class="title">Figure 1. Quick Start architecture for <em>Example Product Name</em> on AWS</div>
+<div class="title">Figure 1. Quick Start architecture for <em>Contact Center Intelligence Post-call Analytics</em> on AWS</div>
 </div>
 <div class="paragraph">
 <p>As shown in Figure 1, the Quick Start sets up the following:</p>
@@ -940,37 +934,51 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A highly available architecture that spans two Availability Zones.*</p>
+<p>An S3 bucket that stores contact center audio recordings.</p>
 </li>
 <li>
-<p>A VPC configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*</p>
+<p>A Lambda function that transcribes the audio recordings to call transcripts.</p>
+</li>
+<li>
+<p>An S3 bucket that stores the transcripts.</p>
+</li>
+<li>
+<p>A DynamoDB table that stores audio URI, transcript URI, text analysis URI and job status.</p>
+</li>
+<li>
+<p>A lambda function that separates turns from the transcript.</p>
+</li>
+<li>
+<p>An S3 bucket that stores the separated turn transcripts.</p>
+</li>
+<li>
+<p>A lambda function that analyses the separated transcripts.</p>
+</li>
+<li>
+<p>An S3 bucket that stores the text analysis output.</p>
+</li>
+<li>
+<p>A glue crawler that pulls metadata from the text analysis and a glue table.</p>
+</li>
+<li>
+<p>An Athena Query that fetches turn by turn sentiment and scores.</p>
+</li>
+<li>
+<p>Amazon API Gateway that exposes provisioning endpoints through HTTPS.</p>
+</li>
+<li>
+<p>A dashboard integrated with QuickSight.</p>
+</li>
+<li>
+<p>A CloudFront distribution to serve HTTPS request to an S3 Bucket hosting all the contents of the solution portal.</p>
+</li>
+<li>
+<p>Amazon Cognito to manage users and give access to the solution portal.</p>
+</li>
+<li>
+<p>An S3 bucket to host the portal website.</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>In the public subnets:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*</p>
-</li>
-<li>
-<p>A Linux bastion host in an Auto Scaling group to allow inbound Secure
-Shell (SSH) access to EC2 instances in public and private subnets.*</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>In the private subnets:
-* &lt;describe any additional components&gt;.</p>
-</div>
-<div class="paragraph">
-<p>*The template that deploys the Quick Start into an existing VPC skips
-the components marked by asterisks and prompts you for your existing VPC
-configuration.</p>
 </div>
 </div>
 </div>
@@ -989,7 +997,35 @@ deploy, and operate your infrastructure and applications on the AWS
 Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start assumes familiarity with &lt;knowledge expectations&gt;.</p>
+<p>This Quick Start assumes familiarity with following AWS services.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.aws.amazon.com/comprehend/index.html" target="_blank" rel="noopener">Amazon Comprehend</a> uses natural language processing (NLP) to extract insights about the content of the call transcripts. It develops insights by recognizing the entities, key phrases, language, sentiments in the transcript.</p>
+</li>
+<li>
+<p><a href="https://console.aws.amazon.com/transcribe/home" target="_blank" rel="noopener">Amazon Transcribe</a> is a fully managed automatic speech recognition (ASR) service that makes it easy for us to convert audio conversations to text.</p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/glue/index.html" target="_blank" rel="noopener">AWS Glue</a> is a fully managed ETL (extract, transform, and load) service that makes it simple and cost-effective to categorize data, clean it, enrich it, and move it reliably between various data stores. AWS Glue crawlers automatically infer database and table schema from the text analysis output file and stores the associated metadata in the AWS Glue Data Catalog.</p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/athena/index.html" target="_blank" rel="noopener">Amazon Athena</a> is an interactive query service that makes it easy to analyze data directly in Amazon Simple Storage Service (Amazon S3) using standard SQL. You can use Athena to run ad-hoc queries against the text analysis bucket.</p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/dynamodb/index.html" target="_blank" rel="noopener">Amazon DynamoDB</a> is a fully managed NoSQL database service that is used in the solution to store the Status of workload throughout.</p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/lambda/index.html" target="_blank" rel="noopener">AWS Lambda</a> allows you to run code without provisioning or managing servers.</p>
+</li>
+<li>
+<p><a href="https://aws.amazon.com/documentation/cloudformation/" target="_blank" rel="noopener">AWS CloudFormation</a> enables you to create and provision AWS infrastructure deployments predictably and repeatedly. The entire solution’s infrastructure is built as Code with CloudFormation.</p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/quicksight/latest/user/welcome.html" target="_blank" rel="noopener">AWS QuickSight</a> is a business analytics service you can use to build visualizations, perform ad hoc analysis, and get business insights from your data. In this solution we use QuickSight to get an aggregated view of the call transcripts insights. We use it to answer questions like “What was the most negative statement uttered by a customer?”</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
@@ -1024,36 +1060,36 @@ Cloud.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VPCs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Elastic IP addresses</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Identity and Access Management (IAM) security groups</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">IAM roles</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Auto Scaling groups</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lambda functions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Application Load Balancers</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 buckets</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Network Load Balancers</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DynamoDb tables</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;type&gt; instances</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&lt;n&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Glue crawlers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">API Gateway endpoints</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CloudFront distributions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cognito user pool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 </tbody>
 </table>
@@ -1063,13 +1099,31 @@ Cloud.</p>
 <div class="paragraph">
 <p>The following regions are currently supported by this Quick Start.</p>
 </div>
+<div class="paragraph">
+<p>This Quick Start is available in all the AWS regions where the following services are available:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p><em>us-east-1 (N. Virginia)</em> (EXAMPLE)</p>
+<p>AWS Glue</p>
 </li>
 <li>
-<p><em>us-east-2 (Ohio)</em> (EXAMPLE)</p>
+<p>Amazon Athena</p>
+</li>
+<li>
+<p>Amazon Transcribe</p>
+</li>
+<li>
+<p>Amazon Comprehend</p>
+</li>
+<li>
+<p>Amazon QuickSight</p>
+</li>
+<li>
+<p>Amazon CloudFront</p>
+</li>
+<li>
+<p>Amazon Cognito</p>
 </li>
 </ul>
 </div>
@@ -1105,21 +1159,21 @@ Certain regions are available on an opt-in basis. Refer to the AWS Documentation
 </div>
 </div>
 <div class="sect3">
-<h4 id="_prepare_your_aws_account">Prepare your AWS account</h4>
+<h4 id="_ml_models">ML Models</h4>
+<div class="sect4">
+<h5 id="_amazon_transcribe_custome_vocabulary">Amazon Transcribe Custome Vocabulary</h5>
 <div class="paragraph">
-<p><em>Describe any setup required in the AWS account prior to template launch</em></p>
+<p>Custom vocabulary is a feature of Amazon Transcribe that helps users transcribe terms that would otherwise not be part of amazon’s ASR service.</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_prepare_your_example_company_name_ltd_account">Prepare your Example Company Name, Ltd. account</h4>
 <div class="paragraph">
-<p><em>Describe any setup required in the partner portal/account prior to template launch</em></p>
+<p>The Quick Start includes a file called vocabulary.txt that contains a list of domain-specific words that teaches Amazon Transcribe to recognize in the audio conversations – this is an example file in the correct format expected by Amazon Transcribe, and it is recommended to build your own specific vocabulary file for your specific usecase.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_prepare_for_the_deployment">Prepare for the deployment</h4>
+<div class="sect4">
+<h5 id="_amazon_comprehend_classifiers">Amazon Comprehend Classifiers</h5>
 <div class="paragraph">
-<p><em>Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3</em></p>
+<p>The Quick Start contains two classifiers, Call Motivation Classifier and Call Resolution Classifier, that help categorize conversations based on motivation and resolution status respectively. The call motivation classifier helps determine the motive of a customer’s call from the initial turns of the call transcript. The call resolution classifier helps determine whether a customer’s concern was resolved or not based on the last few call turns.  These are example classifiers based upon some sample calls, and it is recomended that you build your own classifier model over time based upon the wording found in your calls.</p>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -1130,15 +1184,9 @@ Certain regions are available on an opt-in basis. Refer to the AWS Documentation
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Deploy Example Product Name into a new VPC (end-to-end deployment)</strong>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys Example Product Name into this new VPC.</p>
-</li>
-<li>
-<p><strong>Deploy Example Product Name into an existing VPC</strong>. This option provisions Example Product Name in your existing AWS infrastructure.</p>
+<p><strong>Deploy Contact Center Intelligence Post-call Analytics into an AWS Account (end-to-end deployment)</strong>. This option builds a new AWS environment consisting of the AWS Lambda functions, S3 buckets, CloudFront distribution, Cognito user pool, API gateway endpoint, Glue crawler and DyanmoDb table.</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>The Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Example Product Name settings, as discussed later in this guide.</p>
 </div>
 </div>
 </div>
@@ -1187,35 +1235,17 @@ You are responsible for the cost of the AWS services used while running this Qui
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://qs_launch_link" target="_blank" rel="noopener">Deploy Example Product Name into a new VPC on AWS</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://qs_launch_link" target="_blank" rel="noopener">Deploy Example Product Name into an existing VPC on AWS</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://qs_launch_link" target="_blank" rel="noopener">Deploy Contact Center Intelligence Post-call Analytics on AWS</a></p></td>
 </tr>
 </tbody>
 </table>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-If you’re deploying Example Product Name into an existing VPC, make sure that your VPC has two private subnets in different Availability Zones for the workload instances, and that the subnets aren’t shared. This Quick Start doesn’t support <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-sharing.html" target="_blank" rel="noopener">shared subnets</a>. These subnets require <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html" target="_blank" rel="noopener">NAT gateways</a> in their route tables, to allow the instances to download packages and software without exposing them to the internet.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
-<p>Also, make sure that the domain name option in the DHCP options is configured as explained in the <a href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html" target="_blank" rel="noopener">Amazon VPC documentation</a>. You provide your VPC settings when you launch the Quick Start.</p>
-</div>
-<div class="paragraph">
-<p>Each deployment takes about 30 minutes / 1 hour to complete.</p>
+<p>Each deployment takes about 15 minutes to complete.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
 <li>
-<p>Check the AWS Region that’s displayed in the upper-right corner of the navigation bar, and change it if necessary. This is where the network infrastructure for Example Product Name will be built. The template is launched in the us-east-1 Region by default.</p>
+<p>Check the AWS Region that’s displayed in the upper-right corner of the navigation bar, and change it if necessary. This is where the infrastructure for Contact Center Intelligence Post-call Analytics will be built. The template is launched in the us-east-1 Region by default.</p>
 </li>
 </ol>
 </div>
@@ -1378,7 +1408,7 @@ Region', and 'Quick Start S3 key prefix', unless you are customizing the Quick S
 <p>Choose <strong>Create stack</strong> to deploy the stack.</p>
 </li>
 <li>
-<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Example Product Name deployment is ready.</p>
+<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Contact Center Intelligence Post-call Analytics deployment is ready.</p>
 </li>
 <li>
 <p>Use the values displayed in the <strong>Outputs</strong> tab for the stack, as shown in Figure 2, to view the resources that were created.</p>
@@ -1389,44 +1419,208 @@ Region', and 'Quick Start S3 key prefix', unless you are customizing the Quick S
 <div class="content">
 <img src="images/cfn_outputs.png" alt="cfn_outputs" width="648" height="439">
 </div>
-<div class="title">Figure 2. Example Product Name outputs after successful deployment</div>
+<div class="title">Figure 2. Contact Center Intelligence Post-call Analytics outputs after successful deployment</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_test_the_deployment">Test the deployment</h2>
+<h2 id="_test_deployment">Test deployment</h2>
 <div class="sectionbody">
-
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Make a note of the portal URL in the Output section of the master stack with key PortalEndpoint.</p>
+</li>
+<li>
+<p>Create a User in Cognito under the <strong>UserPool</strong> Created by the stack. Visit this <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/how-to-create-user-accounts.html" target="_blank" rel="noopener">how-to</a> guide to learn how to create a user in a Cognito pool if you’re not familiar with it. By default, usernames in this application must be full email addresses, and passwords must contain one of each of numeric, upper-case, lower-case and special characters; these constraints can be changed within the Cognito console.</p>
+</li>
+<li>
+<p>If you are logged into your AWS account in a browser window already, open the portal endpoint in a different <strong>Incognito Window</strong> as the portal attaches a QuickSight User Role that can interfere with your actual role.</p>
+</li>
+<li>
+<p>Go to the portal and login with the created user.  Upon initial login, you will be prompted to change the temporary password. After you’ve successfully changed the password, you will be directed to the main page where you can see the home page.</p>
+</li>
+</ol>
+</div>
+<div id="mainPage" class="imageblock">
+<div class="content">
+<a class="image" href="images/portal-main.png"><img src="images/portal-main.png" alt="Portal main page" width="648" height="439"></a>
+</div>
+<div class="title">Figure 3. Portal main page</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Click on the Upload button located in the upper right corner of the navigation bar.</p>
+</li>
+<li>
+<p>You will be taken to a page where you can upload audio files.</p>
+</li>
+<li>
+<p>Click Upload.</p>
+</li>
+<li>
+<p>After a successful upload of the audio files the audio processing will run through transcription and text analysis.</p>
+</li>
+<li>
+<p>Click on the Call Analytics Logo in the top left of the Navigation Bar to return to home page.</p>
+</li>
+</ol>
+</div>
+<div id="mainPageWithCalls" class="imageblock">
+<div class="content">
+<a class="image" href="images/portal-with-calls.png"><img src="images/portal-with-calls.png" alt="Portal main page with calls" width="648" height="439"></a>
+</div>
+<div class="title">Figure 4. Portal page with calls</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Drill into a call to see <strong>Amazon Comprehend</strong>’s result of the call classifications and turn-by-turn sentiments.</p>
+</li>
+<li>
+<p>Click on the the [PLAY] icon on each call to playback the original audio file.  Note, not all browsers will be able to playback all file formats that this solution can process; this is due to playback being implemented via the HTML5 &lt;audio&gt; control, and format support is browser-specific.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_post_deployment_steps">Post deployment steps</h2>
 <div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="_best_practices_for_using_example_product_name_on_aws">Best practices for using Example Product Name on AWS</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p><em>Add any best practices for using the software.</em></p>
+<p>Following steps walk you through the process of how you can create QuickSight dashboards and visualizations to see call analytics and insights.</p>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Before you use QuickSight to create visualizations, make sure you have uploaded some audio files so that the glue crawler can create a table from the text_analysis_output bucket. The crawlers are set to run every hour. You can manually run the crawler if it hasn’t run yet. But the table has to exist before QuickSight Athena Connection will succeed.
+</td>
+</tr>
+</table>
 </div>
+<div class="sect2">
+<h3 id="_subscribe_to_amazon_quicksight">Subscribe to Amazon QuickSight</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Sign in to your AWS account in a different browser or incognito window from the one you are running the ICC portal in (the quicksight user roles will conflict if you don’t) and open Amazon QuickSight from the AWS Management Console. It is located under Analytics, and you can find it by searching for "QuickSight".</p>
+</li>
+<li>
+<p>Your AWS account number is displayed for verification purposes. Choose <strong>Sign up for QuickSight</strong>.</p>
+</li>
+<li>
+<p>Choose <strong>Standard</strong>. To confirm, choose <strong>Continue</strong>. A screen titled <strong>Create your QuickSight account</strong> appears.</p>
+</li>
+<li>
+<p>Make choices for the following items:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Type in a unique name for your Amazon QuickSight subscription account. Your account name can only contain characters (A–Z and a–z), digits (0–9), and hyphens (-).</p>
+</li>
+<li>
+<p>Type in your email address to receive Amazon QuickSight service and usage notifications.</p>
+</li>
+<li>
+<p>(Optional) Choose the AWS region you want to utilize for your default SPICE capacity. This is where your account’s free SPICE capacity is allocated after signing up. Note that you aren&#8217;t able to change the default capacity region later, but you can always purchase additional SPICE capacity in different regions as needed. See AWS Regions, Websites, IP Address Ranges, and Endpoints for information on regions.</p>
+</li>
+<li>
+<p>(Optional) Choose whether to allow autodiscovery of your AWS resources. Give QuickSight access to the S3 buckets that begin with text_analysis_output and text_analysis_athena_results. You can change these options later in Manage Account. For more information, see Allowing Autodiscovery of AWS Resources.</p>
+</li>
+</ul>
 </div>
-<div class="sect1">
-<h2 id="_security">Security</h2>
-<div class="sectionbody">
+</li>
+<li>
+<p>Review the choices you made, then choose <strong>Finish</strong>.</p>
+</li>
+</ol>
+</div>
 <div class="paragraph">
-<p><em>Add any security-related information.</em></p>
+<p>After you successfully complete signup, you are ready to explore what you can do with Amazon QuickSight.</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_other_useful_information">Other useful information</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p><em>Add any other details that will help the customer use the software on AWS.</em></p>
+<p>To access QuickSight from the portal, Click on the QuickSight button in the center of the Nav bar. Enter your email address to associate with QuickSight.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_new_analysis">Create new Analysis</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Click on <strong>New Analysis</strong> at the top left corner</p>
+</li>
+<li>
+<p>Click on <strong>New Dataset</strong></p>
+</li>
+<li>
+<p>Select <strong>Athena</strong></p>
+</li>
+<li>
+<p>Enter a Datasource name</p>
+</li>
+<li>
+<p>Click on <strong>Create Datasource</strong></p>
+</li>
+<li>
+<p>Select use custom sql</p>
+</li>
+<li>
+<p>Go to Athena in your AWS console</p>
+</li>
+<li>
+<p>Select Saved Queries</p>
+</li>
+<li>
+<p>Click on the Query named “<strong>Select Turn by turn sentiments</strong>”</p>
+</li>
+<li>
+<p>Copy the Query</p>
+</li>
+<li>
+<p>Go back to your QuickSight tab and paste the query in the custom sql text area</p>
+</li>
+<li>
+<p>Click on <strong>Confirm Query</strong></p>
+</li>
+<li>
+<p>If the Glue crawler has not yet run against your uploaded audio files then you will receive an error message similar to the following.</p>
+<div id="error" class="imageblock">
+<div class="content">
+<a class="image" href="images/crawler-error.png"><img src="images/crawler-error.png" alt="Crawler error" width="648" height="439"></a>
+</div>
+<div class="title">Figure 5. Crawler error</div>
+</div>
+</li>
+<li>
+<p>If this is the case then this can be resolved as follows:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Navigate to the AWS Glue service in the AWS Console.</p>
+</li>
+<li>
+<p>Select Crawlers, and select the text-analysis-metadata-crawler entry.</p>
+</li>
+<li>
+<p>This will show both Tables updated and Tables created as 0 if the crawler hasn’t run.  If this is the case then hit the Run crawler button and wait for it to complete – at this time the Tables added field should have been set to 1.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Finish your dataset creation by selecting directly query your data.</p>
+</li>
+<li>
+<p>Click on <strong>visualize</strong>.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 </div>
@@ -1474,7 +1668,7 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <h2 id="_send_us_feedback">Send us feedback</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To post feedback, submit feature ideas, or report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/aws-quickstart/quickstart-documentation-base" target="_blank" rel="noopener">GitHub repository</a> for this Quick Start. If you’d like to submit code, please review the <a href="https://aws-quickstart.github.io/" target="_blank" rel="noopener">Quick Start Contributor’s Guide</a>.</p>
+<p>To post feedback, submit feature ideas, or report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/aws-quickstart/quickstart-onica-cci-postcall-analytics" target="_blank" rel="noopener">GitHub repository</a> for this Quick Start. If you’d like to submit code, please review the <a href="https://aws-quickstart.github.io/" target="_blank" rel="noopener">Quick Start Contributor’s Guide</a>.</p>
 </div>
 </div>
 </div>
@@ -1490,13 +1684,13 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <h2 id="_github_repository">GitHub repository</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can visit our <a href="https://github.com/aws-quickstart/quickstart-documentation-base" target="_blank" rel="noopener">GitHub repository</a> to download
+<p>You can visit our <a href="https://github.com/aws-quickstart/quickstart-onica-cci-postcall-analytics" target="_blank" rel="noopener">GitHub repository</a> to download
 the templates and scripts for this Quick Start, to post your comments,
 and to share your customizations with others.</p>
 </div>
 <hr>
 <div class="paragraph">
-<p>© 2020, Amazon Web Services, Inc. or its affiliates, and Example Company Name, Ltd.. All rights reserved.</p>
+<p>© 2020, Amazon Web Services, Inc. or its affiliates, and Onica, Inc.. All rights reserved.</p>
 </div>
 <div class="sect3">
 <h4 id="_notices">Notices</h4>
@@ -1512,7 +1706,7 @@ and to share your customizations with others.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-08-06 22:40:57 UTC
+Last updated 2020-08-08 00:51:31 UTC
 </div>
 </div>
 </body>

@@ -1,13 +1,25 @@
 // If no preperation is required, remove all content from here
 
-==== Prepare your AWS account
+//==== Prepare your AWS account
 
-_Describe any setup required in the AWS account prior to template launch_
+//_Describe any setup required in the AWS account prior to template launch_
 
-==== Prepare your {partner-company-name} account
+//==== Prepare your {partner-company-name} account
 
-_Describe any setup required in the partner portal/account prior to template launch_
+//_Describe any setup required in the partner portal/account prior to template launch_
 
-==== Prepare for the deployment
+//==== Prepare for the deployment
 
-_Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3_
+//_Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3_
+
+==== ML Models
+
+===== Amazon Transcribe Custome Vocabulary
+
+Custom vocabulary is a feature of Amazon Transcribe that helps users transcribe terms that would otherwise not be part of amazon’s ASR service.
+
+The Quick Start includes a file called vocabulary.txt that contains a list of domain-specific words that teaches Amazon Transcribe to recognize in the audio conversations – this is an example file in the correct format expected by Amazon Transcribe, and it is recommended to build your own specific vocabulary file for your specific usecase.
+
+===== Amazon Comprehend Classifiers
+
+The Quick Start contains two classifiers, Call Motivation Classifier and Call Resolution Classifier, that help categorize conversations based on motivation and resolution status respectively. The call motivation classifier helps determine the motive of a customer’s call from the initial turns of the call transcript. The call resolution classifier helps determine whether a customer’s concern was resolved or not based on the last few call turns.  These are example classifiers based upon some sample calls, and it is recomended that you build your own classifier model over time based upon the wording found in your calls.

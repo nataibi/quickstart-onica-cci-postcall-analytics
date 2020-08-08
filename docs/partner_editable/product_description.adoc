@@ -2,4 +2,6 @@
 // Briefly describe the software. Use consistent and clear branding. 
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-<Describe how the software works on AWS.>
+This Quick Start deploys a serverless architecture to perform analytics on post call data for contact center solutions. It creates an S3 bucket where call recordings are dropped, which is processed using Amazon Transcribe for automatic speech recognition to create high quality transcript. Natural language processing is done on these transcripts using Amazon Comprehend and result is stored in S3 bucket and in DyanamoDb tables.
+
+You can also use Amazon QuickSight to view the collected data to quickly see the operational dashboards, and reports.
