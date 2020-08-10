@@ -18,4 +18,36 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 == Troubleshooting
 
-<Steps for troubleshooting the deployment go here.>
+* If at any point in time you notice any weird permission errors in your account, try switching the user role in the top right corner of your AWS account.
+
+* If QuickSight fails to execute queries due to S3 errors, then you will have to go to manage account in QuickSight and re add the _text_analysis_output_ and _text_analysis_athena_results_ buckets of your current deployment.
+
+.. Click _Manage QuickSight_
++
+image::../images/manage-quicksight.png[Manage QuickSight,width=648,height=439]
+
+.. Click on _Security & Permissions_
++
+image::../images/security-permissions.png[Security & Permissions,width=648,height=439]
+
+.. Click on _Add or remove_
++
+image::../images/add-or-remove.png[Add or remove,width=648,height=439]
+
+.. Click on _Details_, under Amazon S3
++
+image::../images/details-s3.png[S3 Details,width=648,height=439]
+
+.. Click on _Select S3 buckets_
++
+image::../images/select-s3-buckets.png[Select S3 buckets,width=648,height=439]
+
+.. Select buckets prefixed with _text-analysis-output_ and _text-analysis-athena-results_
++
+image::../images/prefixed-buckets.png[Prefixed buckets,width=648,height=439]
+
+.. Click on _Update_ to save your changes
++
+image::../images/update.png[Save changes,width=648,height=439]
+
+For more QuickSight help, see https://docs.aws.amazon.com/quicksight/latest/user/getting-started.html

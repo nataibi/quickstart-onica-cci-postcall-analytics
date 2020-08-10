@@ -10,18 +10,18 @@
 . If you are logged into your AWS account in a browser window already, open the portal endpoint in a different *Incognito Window* as the portal attaches a QuickSight User Role that can interfere with your actual role.
 
 . Go to the portal and login with the created user.  Upon initial login, you will be prompted to change the temporary password. After you’ve successfully changed the password, you will be directed to the main page where you can see the home page.
-
++
 [#mainPage]
 .Portal main page
 [link=images/portal-main.png]
 image::../images/portal-main.png[Portal main page,width=648,height=439]
 
-. Click on the Upload button located in the upper right corner of the navigation bar.
+. Click on the *Upload* button located in the upper right corner of the navigation bar.
 . You will be taken to a page where you can upload audio files. 
-. Click Upload. 
+. Click *Upload*. 
 . After a successful upload of the audio files the audio processing will run through transcription and text analysis.
-. Click on the Call Analytics Logo in the top left of the Navigation Bar to return to home page.
-
+. Click on the *Call Analytics* Logo in the top left of the Navigation Bar to return to home page.
++
 [#mainPageWithCalls]
 .Portal page with calls
 [link=images/portal-with-calls.png]
