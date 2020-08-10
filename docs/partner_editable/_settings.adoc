@@ -4,7 +4,7 @@
 :doc-month: August
 :doc-year: 2020
 :partner-contributors: {partner-company-name}
-:quickstart-contributors: AWS
+:quickstart-contributors: Amazon Web Services (AWS)
 :deployment_time: 15 minutes
 :default_deployment_region: us-east-1
 // Uncomment these two attributes if you are leveraging

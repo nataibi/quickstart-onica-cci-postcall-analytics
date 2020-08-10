@@ -4,12 +4,12 @@
 |===
 |Parameter label (name) |Default Value|Description|Custom Vocabulary Name
 (`CustomVocabularyName`)|`custom-vocabulary`|The name of the Amazon Transcribe Custom Vocabulary|User Pool Name
-(`UserPoolName`)|`MyUserPool`|NO_DESCRIPTION|User Pool Domain Name
-(`UserPoolDomainName`)|`icc-domain`|NO_DESCRIPTION|Identity Pool Name
-(`IdentityPoolName`)|`MyIdentityPool`|NO_DESCRIPTION|User Policy Name
-(`UserPolicyName`)|`MyUserPolicy`|NO_DESCRIPTION|Allowed Origins
-(`AllowedOrigins`)|`*`|NO_DESCRIPTION|Contact email
-(`NotificationEmail`)|`test@example.com`|NO_DESCRIPTION|Agent channel for multi-channel audio
+(`UserPoolName`)|`MyUserPool`|Amzon Cognito User Pool name|User Pool Domain Name
+(`UserPoolDomainName`)|`icc-domain`|Amazon Cognito User Pool Domain name. This value needs to be globally unique, otherwise the deployment will fail.|Identity Pool Name
+(`IdentityPoolName`)|`MyIdentityPool`|Amazon Cognito Identiy Pool name|User Policy Name
+(`UserPolicyName`)|`MyUserPolicy`|Name of the user policy|Allowed Origins
+(`AllowedOrigins`)|`*`|Allowed origins for the Portal website|Contact email
+(`NotificationEmail`)|`test@example.com`|Email address used for the notifications|Agent channel for multi-channel audio
 (`AgentChannel`)|`0`|Left(0), or Right(1). Customer will be set to the other channel.|Agent speaker label for single-channel audio
 (`AgentSpeakerLabel`)|`0`|First speaker(0) or last speaker(1). Customer will be set to the other label.|Display name of the call resolution classifier in Amazon Comprehend
 (`CallResolutionClassifierName`)|`call-resolution`|The name of the Call Resolution Classifier|Display name of the call motivation classifier in Amazon Comprehend

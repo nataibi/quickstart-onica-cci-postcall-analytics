@@ -3,8 +3,8 @@ Deploying this Quick Start with *default parameters* builds the following _{part
 // Replace this example diagram with your own. Send us your source PowerPoint file. Be sure to follow our guidelines here : http://(we should include these points on our contributors giude)
 [#architecture1]
 .Quick Start architecture for _{partner-product-name}_ on AWS
-[link=../images/onica-pca-arch.png]
-image::../../images/onica-pca-arch.png[Architecture,width=648,height=439]
+[link=images/onica-pca-arch.png]
+image::../images/onica-pca-arch.png[Architecture,width=648,height=439]
 
 As shown in Figure 1, the Quick Start sets up the following:
 

@@ -75,29 +75,35 @@ Parameters:
   UserPoolName:
     Type: String
     Default: MyUserPool
+    Description: Amzon Cognito User Pool name
   UserPoolDomainName:
     Type: String
     Default: icc-domain
+    Description: Amazon Cognito User Pool Domain name. This value needs to be globally unique, otherwise the deployment will fail.
   IdentityPoolName:
     Type: String
     Default: MyIdentityPool
+    Description: Amazon Cognito Identiy Pool name
   UserPolicyName:
     Type: String
     Default: MyUserPolicy
+    Description: Name of the user policy
   AllowedOrigins:
     Type: String
     Default: '*'
+    Description: Allowed origins for the Portal website
   DefaultRoot:
-    Description: 'The default path for the index document.'
+    Description: The default path for the index document
     Type: String
-    Default: 'index.html'
+    Default: index.html
   ErrorPage:
-    Description: 'The path of the error page for the website.'
+    Description: The path of the error page for the website
     Type: String
-    Default: 'error.html'
+    Default: error.html
   QuickSightUserRoleName:
     Type: String
     Default: QuickSightUserRole
+    Description: IAM Role name for the Amazon QuickSight user
   CallResolutionClassifierName:
     Type: String
     Default: call-resolution
@@ -110,6 +116,7 @@ Parameters:
     Type: String
     Default: 'test@example.com'
     AllowedPattern: '^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$'
+    Description: Email address used for the notifications
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).

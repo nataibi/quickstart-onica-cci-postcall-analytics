@@ -821,7 +821,7 @@ table p {
 <div class="paragraph text-center">
 <p><strong>August, 2020</strong><br>
 <em>Onica, Inc.</em><br>
-<em>AWS</em></p>
+<em>Amazon Web Services (AWS)</em></p>
 </div>
 <div class="admonitionblock tip text-left">
 <table>
@@ -851,7 +851,7 @@ report bugs, or submit feature ideas for this Quick Start.
 <p>This Quick Start is for users who wants to setup Contact Center Intelligence Post-call Analytics on AWS, to help drive deeper quality management insights through automatic analysis of contact center conversations, generating actionable insights such as product and service feedback loops that can be used to benefit the rest of the organization, or the best performing interactions such as those ending with a positive sentiment score.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start combines Amazon Transcribe for Automatic Speech Recognition to create a high-quality transcript for Amazon Comprehend to apply NLP to the transcript and analyze the interaction. Using Amazon QuickSight to view the data collected customers can quickly see the operational dashboards, reports and other deep insights collected from the post call data.</p>
+<p>This Quick Start uses Amazon Transcribe for Automatic Speech Recognition to create a high-quality transcript. Amazon Comprehend apply NLP to the transcript and analyze the interactions. Using Amazon QuickSight, customers can view the collected data quickly to see the operational dashboards, reports and other deep insights collected from the post call data.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -924,7 +924,7 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
-<a class="image" href="../images/onica-pca-arch.png"><img src="../images/onica-pca-arch.png" alt="Architecture" width="648" height="439"></a>
+<a class="image" href="images/onica-pca-arch.png"><img src="images/onica-pca-arch.png" alt="Architecture" width="648" height="439"></a>
 </div>
 <div class="title">Figure 1. Quick Start architecture for <em>Contact Center Intelligence Post-call Analytics</em> on AWS</div>
 </div>
@@ -1163,7 +1163,7 @@ Certain regions are available on an opt-in basis. Refer to the AWS Documentation
 <div class="sect4">
 <h5 id="_amazon_transcribe_custome_vocabulary">Amazon Transcribe Custome Vocabulary</h5>
 <div class="paragraph">
-<p>Custom vocabulary is a feature of Amazon Transcribe that helps users transcribe terms that would otherwise not be part of amazon’s ASR service.</p>
+<p>Custom vocabulary is a feature of Amazon Transcribe that helps users transcribe terms and phrases, which are generally domain-specific.</p>
 </div>
 <div class="paragraph">
 <p>The Quick Start includes a file called vocabulary.txt that contains a list of domain-specific words that teaches Amazon Transcribe to recognize in the audio conversations – this is an example file in the correct format expected by Amazon Transcribe, and it is recommended to build your own specific vocabulary file for your specific usecase.</p>
@@ -1172,14 +1172,14 @@ Certain regions are available on an opt-in basis. Refer to the AWS Documentation
 <div class="sect4">
 <h5 id="_amazon_comprehend_classifiers">Amazon Comprehend Classifiers</h5>
 <div class="paragraph">
-<p>The Quick Start contains two classifiers, Call Motivation Classifier and Call Resolution Classifier, that help categorize conversations based on motivation and resolution status respectively. The call motivation classifier helps determine the motive of a customer’s call from the initial turns of the call transcript. The call resolution classifier helps determine whether a customer’s concern was resolved or not based on the last few call turns.  These are example classifiers based upon some sample calls, and it is recomended that you build your own classifier model over time based upon the wording found in your calls.</p>
+<p>The Quick Start contains two classifiers, Call Motivation Classifier and Call Resolution Classifier, that help categorize conversations based on motivation and resolution status, respectively. The call motivation classifier helps determine the motive of a customer’s call from the initial turns of the call transcript. The call resolution classifier helps determine whether a customer’s concern was resolved or not based on the last few call turns. These are example classifiers based upon some sample calls, and it is recomended that you build your own classifier model over time based upon the wording found in your calls.</p>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_deployment_options">Deployment options</h4>
 <div class="paragraph">
-<p>This Quick Start provides two deployment options:</p>
+<p>This Quick Start provides following deployment option:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1303,37 +1303,37 @@ Region', and 'Quick Start S3 key prefix', unless you are customizing the Quick S
 <td class="tableblock halign-left valign-top"><p class="tableblock">User Pool Name
 (<code>UserPoolName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>MyUserPool</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NO_DESCRIPTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amzon Cognito User Pool name</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">User Pool Domain Name
 (<code>UserPoolDomainName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>icc-domain</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NO_DESCRIPTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon Cognito User Pool Domain name. This value needs to be globally unique, otherwise the deployment will fail.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identity Pool Name
 (<code>IdentityPoolName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>MyIdentityPool</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NO_DESCRIPTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon Cognito Identiy Pool name</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">User Policy Name
 (<code>UserPolicyName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>MyUserPolicy</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NO_DESCRIPTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the user policy</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Origins
 (<code>AllowedOrigins</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NO_DESCRIPTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed origins for the Portal website</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Contact email
 (<code>NotificationEmail</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>test@example.com</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NO_DESCRIPTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Email address used for the notifications</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Agent channel for multi-channel audio
@@ -1440,42 +1440,34 @@ Region', and 'Quick Start S3 key prefix', unless you are customizing the Quick S
 </li>
 <li>
 <p>Go to the portal and login with the created user.  Upon initial login, you will be prompted to change the temporary password. After you’ve successfully changed the password, you will be directed to the main page where you can see the home page.</p>
-</li>
-</ol>
-</div>
 <div id="mainPage" class="imageblock">
 <div class="content">
 <a class="image" href="images/portal-main.png"><img src="images/portal-main.png" alt="Portal main page" width="648" height="439"></a>
 </div>
 <div class="title">Figure 3. Portal main page</div>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
+</li>
 <li>
-<p>Click on the Upload button located in the upper right corner of the navigation bar.</p>
+<p>Click on the <strong>Upload</strong> button located in the upper right corner of the navigation bar.</p>
 </li>
 <li>
 <p>You will be taken to a page where you can upload audio files.</p>
 </li>
 <li>
-<p>Click Upload.</p>
+<p>Click <strong>Upload</strong>.</p>
 </li>
 <li>
 <p>After a successful upload of the audio files the audio processing will run through transcription and text analysis.</p>
 </li>
 <li>
-<p>Click on the Call Analytics Logo in the top left of the Navigation Bar to return to home page.</p>
-</li>
-</ol>
-</div>
+<p>Click on the <strong>Call Analytics</strong> Logo in the top left of the Navigation Bar to return to home page.</p>
 <div id="mainPageWithCalls" class="imageblock">
 <div class="content">
 <a class="image" href="images/portal-with-calls.png"><img src="images/portal-with-calls.png" alt="Portal main page with calls" width="648" height="439"></a>
 </div>
 <div class="title">Figure 4. Portal page with calls</div>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
+</li>
 <li>
 <p>Drill into a call to see <strong>Amazon Comprehend</strong>’s result of the call classifications and turn-by-turn sentiments.</p>
 </li>
@@ -1659,8 +1651,78 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <div class="sect1">
 <h2 id="_troubleshooting">Troubleshooting</h2>
 <div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>If at any point in time you notice any weird permission errors in your account, try switching the user role in the top right corner of your AWS account.</p>
+</li>
+<li>
+<p>If QuickSight fails to execute queries due to S3 errors, then you will have to go to manage account in QuickSight and re add the <em>text_analysis_output</em> and <em>text_analysis_athena_results</em> buckets of your current deployment.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Click <em>Manage QuickSight</em></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/manage-quicksight.png" alt="Manage QuickSight" width="648" height="439">
+</div>
+</div>
+</li>
+<li>
+<p>Click on <em>Security &amp; Permissions</em></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/security-permissions.png" alt="Security &amp; Permissions" width="648" height="439">
+</div>
+</div>
+</li>
+<li>
+<p>Click on <em>Add or remove</em></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/add-or-remove.png" alt="Add or remove" width="648" height="439">
+</div>
+</div>
+</li>
+<li>
+<p>Click on <em>Details</em>, under Amazon S3</p>
+<div class="imageblock">
+<div class="content">
+<img src="images/details-s3.png" alt="S3 Details" width="648" height="439">
+</div>
+</div>
+</li>
+<li>
+<p>Click on <em>Select S3 buckets</em></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/select-s3-buckets.png" alt="Select S3 buckets" width="648" height="439">
+</div>
+</div>
+</li>
+<li>
+<p>Select buckets prefixed with <em>text-analysis-output</em> and <em>text-analysis-athena-results</em></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/prefixed-buckets.png" alt="Prefixed buckets" width="648" height="439">
+</div>
+</div>
+</li>
+<li>
+<p>Click on <em>Update</em> to save your changes</p>
+<div class="imageblock">
+<div class="content">
+<img src="images/update.png" alt="Save changes" width="648" height="439">
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
 <div class="paragraph">
-<p>&lt;Steps for troubleshooting the deployment go here.&gt;</p>
+<p>For more QuickSight help, see <a href="https://docs.aws.amazon.com/quicksight/latest/user/getting-started.html" class="bare">https://docs.aws.amazon.com/quicksight/latest/user/getting-started.html</a></p>
 </div>
 </div>
 </div>
@@ -1706,7 +1768,7 @@ and to share your customizations with others.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-08-08 00:51:31 UTC
+Last updated 2020-08-10 18:20:36 UTC
 </div>
 </div>
 </body>
