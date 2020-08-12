@@ -2,7 +2,7 @@
 .Amazon intelligent contact center post-call analytics configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default Value|Description|Custom Vocabulary Name
+|Parameter label (name) |Default value|Description|Custom Vocabulary Name
 (`CustomVocabularyName`)|`custom-vocabulary`|The name of the Amazon Transcribe Custom Vocabulary|User Pool Name
 (`UserPoolName`)|`MyUserPool`|Amzon Cognito User Pool name|User Pool Domain Name
 (`UserPoolDomainName`)|`icc-domain`|Amazon Cognito User Pool Domain name. This value needs to be globally unique, otherwise the deployment will fail.|Identity Pool Name
@@ -18,7 +18,7 @@
 .AWS Quick Start configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default Value|Description|Quick Start S3 bucket name
+|Parameter label (name) |Default value|Description|Quick Start S3 bucket name
 (`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 key prefix
 (`QSS3KeyPrefix`)|`quickstart-onica-cci-postcall-analytics/`|S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), dots (.) and forward slash (/) and it should end with a forward slash (/).|Quick Start S3 bucket region
 (`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.

@@ -1,6 +1,6 @@
 :quickstart-project-name: quickstart-onica-cci-postcall-analytics
 :partner-product-name: Contact Center Intelligence Post-call Analytics
-:partner-company-name: Onica, Inc.
+:partner-company-name: Onica, a Rackspace Technology Company
 :doc-month: August
 :doc-year: 2020
 :partner-contributors: {partner-company-name}
