@@ -47,7 +47,10 @@ Resources:
                       'Bucket': source_bucket,
                       'Key': key
                   }
-                  s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)
+                  if o.find("index.html")!=-1:
+                      s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key,Metadata={"content-type": "text/html"})
+                  else:
+                      s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)
 
 
           def delete_objects(bucket):
